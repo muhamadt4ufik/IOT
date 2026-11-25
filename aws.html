@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MIT - Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root{--bg:#080d1a;--surface:#0f1729;--surface-2:#141f37;--border:rgba(148,163,184,.14);--text:#e8edf7;--text-2:#9aa8c2;--text-3:#7384a0;--accent:#22d3ee;--accent-soft:rgba(34,211,238,.12);--good:#34d399;--bad:#f87171;--c-temp:#fb923c;--c-hum:#38bdf8;--c-wind:#2dd4bf;--c-pres:#a78bfa;--c-rain:#818cf8;--c-solar:#fbbf24;--north:#f87171;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.16);--r:14px;--gap:16px;--sans:'Inter','Segoe UI',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}
+[data-theme=light]{--bg:#eef2f7;--surface:#fff;--surface-2:#f5f7fb;--border:rgba(15,23,42,.1);--text:#0f172a;--text-2:#475569;--text-3:#64748b;--accent:#0891b2;--accent-soft:rgba(8,145,178,.1);--good:#059669;--bad:#dc2626;--c-temp:#ea580c;--c-hum:#0284c7;--c-wind:#0d9488;--c-pres:#7c3aed;--c-rain:#4f46e5;--c-solar:#d97706;--north:#dc2626;--shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding:20px;-webkit-font-smoothing:antialiased;background-image:radial-gradient(900px 400px at 0% 0%,var(--accent-soft),transparent 70%)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1440px;margin:0 auto}
+.topbar,.card,.panel,.chart-card,.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.topbar{position:relative;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 20px;margin-bottom:var(--gap);overflow:hidden}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;color:#04222b;background:linear-gradient(135deg,var(--accent),var(--c-wind))}
+.brand h1{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.brand p{font-size:12px;color:var(--text-2);margin-top:2px}
+.top-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.clock{display:flex;gap:18px;padding-right:14px;margin-right:4px;border-right:1px solid var(--border)}
+.clock div{display:flex;flex-direction:column;gap:2px}
+.clock small{font-size:11px;color:var(--text-3);font-weight:500}
+.clock b{font-size:16px;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2)}
+.pill.live{color:var(--good);border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,currentColor 55%,transparent)}100%{box-shadow:0 0 0 8px transparent}}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer}
+.icon-btn:hover,.btn:hover{color:var(--accent);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{position:absolute;left:0;bottom:0;height:2px;width:100%}
+.progress span{display:block;height:100%;width:0;background:var(--accent);transition:width 1s linear}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:var(--gap);margin-bottom:var(--gap);align-items:start}
+.group+.group{margin-top:var(--gap)}
+.group-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:10px}
+.group-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--gap)}
+.card{padding:16px 18px 12px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.card:hover{border-color:color-mix(in srgb,var(--ac) 50%,transparent)}
+.card-top{display:flex;align-items:center;gap:10px}
+.ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:15px;color:var(--ac);background:color-mix(in srgb,var(--ac) 15%,transparent)}
+.lbl{font-size:13px;font-weight:500;color:var(--text-2);flex:1}
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.val{display:flex;align-items:baseline;gap:6px;font-family:var(--mono);font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.val small{font-size:13px;color:var(--text-3);font-weight:500;letter-spacing:0}
+.val.flash{animation:flash .9s}
+@keyframes flash{0%{color:var(--ac)}100%{color:var(--text)}}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--text-2);flex-wrap:wrap}
+.up{color:var(--good)}.down{color:var(--bad)}.flat{color:var(--text-3)}
+.bar{height:5px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--ac);transition:width .6s}
+.spark{height:34px;width:100%;display:block;margin-top:2px}
+.panel{padding:18px;position:sticky;top:16px}
+.panel-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.panel-title i{color:var(--c-wind)}
+.panel-sub{font-size:12px;color:var(--text-2);margin:4px 0 8px}
+#compass{width:100%;max-width:340px;display:block;margin:0 auto}
+#compass text{text-anchor:middle;dominant-baseline:central}
+.cp-bg{fill:var(--surface-2);stroke:var(--border)}
+.cp-ring{fill:none;stroke:var(--border)}
+.cp-tick{stroke:var(--text-3);stroke-width:1;opacity:.55}.cp-tick.maj{stroke-width:1.6;opacity:.95}
+.cp-deg{fill:var(--text-3);font:500 9px var(--mono)}
+.cp-card{fill:var(--text);font:700 17px var(--sans)}
+.cp-sec{fill:var(--text-2);font:600 8px var(--sans)}.cp-sec.b{font-size:10px;font-weight:700}
+.cp-star{fill:var(--accent-soft);stroke:var(--text-3);stroke-width:.8}
+#needle{transform-origin:170px 170px;transition:transform .9s cubic-bezier(.3,.8,.3,1)}
+.cp-hub{fill:var(--surface);stroke:var(--c-wind);stroke-width:2}
+.cp-dir{fill:var(--text);font:700 15px var(--sans)}.cp-dd{fill:var(--text-2);font:500 10px var(--mono)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.stat{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.stat small{display:block;font-size:12px;color:var(--text-3);font-weight:500}
+.stat b{display:block;margin-top:3px;font-size:17px;font-weight:600}
+.stat span{font-size:11px;color:var(--text-2)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+.chart-card{padding:18px;min-width:0}
+.chart-card.wide{grid-column:1/-1}
+.chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chart-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.chart-title i{color:var(--accent)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text-2)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:8px;height:8px;border-radius:50%}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%}
+.tip{position:absolute;top:8px;pointer-events:none;display:none;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;box-shadow:var(--shadow);white-space:nowrap;z-index:2}
+.tip b{display:block;color:var(--text-2);font-weight:600;margin-bottom:3px}
+.tip div{display:flex;gap:6px;align-items:center}
+.tip i{width:8px;height:8px;border-radius:50%}
+.table-card{padding:18px}
+.table-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;gap:7px;align-items:center;font:inherit;font-size:12px;font-weight:600;padding:7px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer}
+.tscroll{overflow:auto;max-height:380px;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;min-width:780px}
+th{position:sticky;top:0;background:var(--surface-2);text-align:right;padding:10px 14px;font-size:12px;color:var(--text-2);font-weight:600;border-bottom:1px solid var(--border)}
+td{text-align:right;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);font-family:var(--mono);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th:last-child,td:last-child{text-align:center}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+tbody tr:hover{background:var(--accent-soft)}
+tr.new td{animation:row 2s}
+@keyframes row{0%{background:var(--accent-soft)}100%{background:transparent}}
+.chip{display:inline-flex;font-family:var(--sans);font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.chip.dir{font-family:var(--mono);color:var(--c-wind);background:color-mix(in srgb,var(--c-wind) 14%,transparent)}
+.footer{text-align:center;color:var(--text-3);font-size:12px;padding:18px}
+/* AWS 3D station illustration */
+        .aws-scene-card {
+            background: linear-gradient(145deg, rgba(20, 30, 60, .92), rgba(9, 22, 45, .96));
+            border: 1px solid rgba(0, 150, 255, .2);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, .2);
+        }
+
+        .aws-scene-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:10px; }
+        .aws-scene-title { font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; }
+        .aws-scene-title i { color:#00ffc8; }
+        .aws-scene-subtitle { color:#8a9bb8; font-size:12px; margin-top:5px; }
+        .scene-tag { color:#00ffc8; background:rgba(0,255,200,.08); border:1px solid rgba(0,255,200,.2); border-radius:20px; padding:6px 10px; white-space:nowrap; font-size:11px; }
+        .aws-scene-svg { display:block; width:100%; height:auto; min-height:260px; }
+        .scene-label { font: 600 12px 'Segoe UI', sans-serif; fill:#e0e6ed; }
+        .scene-note { font: 10px 'Segoe UI', sans-serif; fill:#8a9bb8; }
+        .scene-callout { fill:rgba(8,18,39,.88); stroke:rgba(0,150,255,.4); stroke-width:1; }
+        .scene-wire { fill:none; stroke:#00ffc8; stroke-width:1.4; stroke-dasharray:4 4; opacity:.85; }
+        .scene-foot { display:flex; flex-wrap:wrap; justify-content:center; gap:9px 22px; color:#aebbd0; font-size:11px; margin-top:-2px; }
+        .scene-foot button { display:flex; align-items:center; gap:7px; color:#aebbd0; font:inherit; background:rgba(0,150,255,.07); border:1px solid rgba(138,155,184,.17); border-radius:20px; padding:7px 11px; cursor:pointer; transition:all .2s ease; }
+        .scene-foot button:hover, .scene-foot button.active { color:#00ffc8; border-color:rgba(0,255,200,.48); background:rgba(0,255,200,.1); box-shadow:0 0 16px rgba(0,255,200,.12); }
+        .scene-foot i { color:#00ffc8; font-size:10px; }
+        .scene-focus-ring { fill:none; stroke:#00ffc8; stroke-width:3; filter:drop-shadow(0 0 7px #00ffc8); animation:scenePing 1.5s ease-out infinite; }
+        .scene-focus-dot { fill:#00ffc8; stroke:#e5fff9; stroke-width:2; filter:drop-shadow(0 0 8px #00ffc8); }
+        .scene-reading { fill:rgba(7,20,40,.96); stroke:#00ffc8; stroke-width:1.5; filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)); }
+        #sceneReading { transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+        .scene-reading-title { fill:#8a9bb8; font:600 10px 'Segoe UI',sans-serif; letter-spacing:.5px; }
+        .scene-reading-value { fill:#00ffc8; font:700 15px 'Segoe UI',sans-serif; }
+        @keyframes scenePing { 0% { r:9; opacity:1; } 100% { r:27; opacity:0; } }
+        .aws-scene-3d { position:relative; height:460px; border-radius:14px; overflow:hidden; margin-bottom:14px; background:linear-gradient(135deg,#0c2444,#101a36); touch-action:none; cursor:grab; }
+        .aws-scene-3d:active { cursor:grabbing; }
+        .aws-scene-3d canvas { display:block; width:100%; height:100%; }
+        #awsLabels { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+        .aws-chip { position:absolute; left:0; top:0; display:none; will-change:transform; }
+        .aws-chip-dot { position:absolute; left:-4px; top:-4px; width:8px; height:8px; border-radius:50%; background:#00ffc8; border:1.5px solid #e5fff9; }
+        .aws-chip-body { position:absolute; top:-19px; display:flex; flex-direction:column; white-space:nowrap; background:rgba(8,18,39,.88); border:1px solid rgba(0,150,255,.4); border-radius:8px; padding:4px 10px; }
+        .aws-chip-r .aws-chip-body { left:14px; }
+        .aws-chip-l .aws-chip-body { right:14px; }
+        .aws-chip-body b { font:600 12px 'Segoe UI',sans-serif; color:#e0e6ed; }
+        .aws-chip-body small { font:10px 'Segoe UI',sans-serif; color:#8a9bb8; }
+        .aws-line-layer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+        .aws-line-layer line { stroke:#00ffc8; stroke-width:2; stroke-dasharray:4 4; }
+        .aws-marker { position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; will-change:transform; }
+        .aws-marker span { position:absolute; left:-5px; top:-5px; width:10px; height:10px; border-radius:50%; background:#00ffc8; border:2px solid #e5fff9; box-shadow:0 0 10px #00ffc8; }
+        .aws-marker span::after { content:''; position:absolute; left:-9px; top:-9px; width:24px; height:24px; border-radius:50%; border:3px solid #00ffc8; animation:awsPing 1.5s ease-out infinite; }
+        @keyframes awsPing { 0% { transform:scale(.4); opacity:1; } 100% { transform:scale(1.6); opacity:0; } }
+        .aws-reading { position:absolute; left:0; top:0; min-width:154px; background:rgba(7,20,40,.96); border:1.5px solid #00ffc8; border-radius:9px; padding:8px 12px; pointer-events:none; box-shadow:0 4px 10px rgba(0,0,0,.45); will-change:transform; }
+        .aws-reading-title { color:#8a9bb8; font:600 10px 'Segoe UI',sans-serif; letter-spacing:.5px; }
+        .aws-reading-value { color:#00ffc8; font:700 15px 'Segoe UI',sans-serif; margin-top:4px; white-space:normal; }
+        .aws-reading-info { color:#d5e1ef; font:500 11px 'Segoe UI',sans-serif; line-height:1.45; margin-top:5px; max-width:230px; white-space:pre-line; overflow-wrap:anywhere; }
+        .aws-fallback { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#8a9bb8; font-size:13px; text-align:center; padding:20px; }
+        @media (max-width: 600px) {
+            .aws-scene-3d { height:360px; }
+            .aws-chip-body small { display:none; }
+            .aws-chip-body b { font-size:11px; }
+        }
+
+
+        @media (max-width: 600px) {
+            .aws-scene-card { padding:16px 12px; }
+            .aws-scene-head { flex-direction:column; }
+            .aws-scene-svg { min-height:180px; }
+            .scene-label { font-size:14px; }
+            .scene-note { font-size:11px; }
+        }
+
+        
+.aws-scene-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:var(--gap);box-shadow:var(--shadow)}
+.aws-scene-title{font-size:14px}.aws-scene-title i{color:var(--accent)}
+.aws-scene-subtitle{color:var(--text-2)}
+.scene-tag{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.scene-foot button{color:var(--text-2);background:var(--surface-2);border-color:var(--border)}
+.scene-foot button:hover,.scene-foot button.active{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
+.scene-foot i{color:var(--accent)}
+.aws-scene-3d{height:960px}
+@media(max-width:700px){.aws-scene-3d{height:720px}}
+.scene-panels{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:12px 0 16px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px}
+.scene-pan{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;color:var(--text-2);font-size:12px}
+.scene-pan label{display:flex;align-items:center;gap:7px;white-space:nowrap}.scene-pan label i{color:var(--accent)}
+.scene-pan input{width:100%;accent-color:var(--accent);cursor:ew-resize}.scene-pan small{font:11px var(--mono);color:var(--text-3);min-width:28px;text-align:center}
+@media(max-width:700px){.scene-panels{grid-template-columns:1fr;gap:12px;padding:12px}}
+@media(max-width:1100px){.main{grid-template-columns:1fr}.panel{position:static}}
+@media(max-width:700px){body{padding:12px}.charts{grid-template-columns:1fr}.topbar{padding:14px}.clock{border:0;padding:0;width:100%;justify-content:space-between}.val{font-size:30px}.aws-scene-3d{height:360px}}
+/* Gerak antarmuka dashboard (visualisasi 3D tidak disentuh). */
+.topbar{isolation:isolate}
+.topbar::before{content:'';position:absolute;inset:0 auto 0 -35%;width:28%;pointer-events:none;background:linear-gradient(105deg,transparent,rgba(34,211,238,.09),transparent);transform:skewX(-18deg);animation:topSweep 9s ease-in-out infinite}
+@keyframes topSweep{0%,65%{left:-35%;opacity:0}72%{opacity:1}100%{left:115%;opacity:0}}
+.logo{position:relative;box-shadow:0 0 0 0 rgba(34,211,238,.35);animation:logoGlow 3s ease-in-out infinite}
+.logo::after{content:'';position:absolute;inset:-4px;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:15px;animation:logoRing 3s ease-out infinite}
+@keyframes logoGlow{50%{box-shadow:0 0 24px color-mix(in srgb,var(--accent) 35%,transparent)}}
+@keyframes logoRing{0%{transform:scale(.92);opacity:.75}100%{transform:scale(1.28);opacity:0}}
+.card{position:relative;overflow:hidden;animation:cardRise .65s both;transition:transform .28s cubic-bezier(.2,.75,.25,1),box-shadow .28s,border-color .25s}
+.card:nth-child(2){animation-delay:.08s}.card:nth-child(3){animation-delay:.16s}.card:nth-child(4){animation-delay:.24s}
+@keyframes cardRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.card::before{content:'';position:absolute;left:0;top:18px;bottom:18px;width:2px;background:var(--ac);box-shadow:0 0 12px var(--ac);opacity:.68;transform:scaleY(.35);transform-origin:center;transition:transform .3s,opacity .3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.24),0 0 22px color-mix(in srgb,var(--ac) 12%,transparent)}
+.card:hover::before{transform:scaleY(1);opacity:1}
+.ico{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.card:hover .ico{transform:rotate(-8deg) scale(1.1);box-shadow:0 0 18px color-mix(in srgb,var(--ac) 28%,transparent)}
+.badge{transition:filter .25s,transform .25s}.card:hover .badge{filter:brightness(1.18);transform:translateY(-1px)}
+.bar i{position:relative;overflow:hidden;box-shadow:0 0 10px color-mix(in srgb,var(--ac) 45%,transparent)}
+.bar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-120%);animation:barGlint 3.4s ease-in-out infinite}
+@keyframes barGlint{45%,100%{transform:translateX(120%)}}
+.spark path:last-child{stroke-dasharray:180;stroke-dashoffset:180;animation:drawSpark 1.25s ease-out forwards}
+@keyframes drawSpark{to{stroke-dashoffset:0}}
+.pill.live{box-shadow:inset 0 0 14px color-mix(in srgb,var(--good) 8%,transparent)}
+.pill.live .dot{box-shadow:0 0 10px currentColor;animation:ledPulse 1.35s ease-in-out infinite}
+@keyframes ledPulse{0%,100%{opacity:.65;filter:brightness(.85)}50%{opacity:1;filter:brightness(1.5);box-shadow:0 0 14px currentColor}}
+.chart-card,.table-card,.panel{transition:box-shadow .3s,border-color .3s}
+.chart-card:hover,.table-card:hover,.panel:hover{border-color:color-mix(in srgb,var(--accent) 28%,var(--border));box-shadow:var(--shadow),0 0 24px color-mix(in srgb,var(--accent) 7%,transparent)}
+.icon-btn,.btn,.scene-foot button{transition:transform .2s,box-shadow .2s,color .2s,border-color .2s}
+.icon-btn:hover,.btn:hover,.scene-foot button:hover{transform:translateY(-2px);box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 18%,transparent)}
+.group-title{letter-spacing:.04em;text-transform:uppercase;font-size:11px}
+@media(prefers-reduced-motion:reduce){.topbar::before,.logo,.logo::after,.card,.bar i::after,.spark path:last-child{animation:none!important}.card{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><i class="fas fa-cloud-sun"></i></div>
+    <div><h1>AWS MIT</h1><p>Automatic Weather Station - M. Taufik, Idris dan Toni Satria</p></div>
+  </div>
+  <div class="top-right">
+    <div class="clock">
+      <div><small>UTC</small><b class="mono" id="t-utc">--:--:--</b></div>
+      <div><small>WIB</small><b class="mono" id="t-wib">--:--:--</b></div>
+      <div><small>Tanggal (UTC)</small><b id="date-display" style="font-size:13px">--</b></div>
+    </div>
+    <span class="pill live"><span class="dot"></span>Online</span>
+    <span class="pill" title="Data diperbarui tiap 10 menit"><i class="far fa-hourglass"></i>Update berikutnya <b class="mono" id="countdown" style="color:var(--text)">10:00</b></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Ganti tema"><i class="fas fa-sun"></i></button>
+  </div>
+  <div class="progress"><span id="progressBar"></span></div>
+</header>
+
+<div class="main">
+  <div>
+    <section class="group"><div class="group-title">Atmosfer</div><div class="cards" id="grp-atm"></div></section>
+    <section class="group"><div class="group-title">Presipitasi &amp; radiasi</div><div class="cards" id="grp-pre"></div></section>
+  </div>
+  <aside class="panel" aria-label="Arah dan kecepatan angin">
+    <div class="panel-title"><i class="fas fa-compass"></i> Arah &amp; kecepatan angin</div>
+    <div class="panel-sub" id="cp-caption">-</div>
+    <svg id="compass" viewBox="0 0 340 340" role="img" aria-label="Kompas arah angin"></svg>
+    <div class="stats">
+      <div class="stat"><small>Kecepatan</small><b class="mono" id="st-speed">--</b><span id="st-ms"></span></div>
+      <div class="stat"><small>Skala Beaufort</small><b class="mono" id="st-bf">--</b><span id="st-bft"></span></div>
+      <div class="stat"><small>Hembusan maks</small><b class="mono" id="st-gust">--</b><span>1 jam terakhir</span></div>
+      <div class="stat"><small>Arah rata-rata</small><b class="mono" id="st-avg">--</b><span>1 jam terakhir</span></div>
+    </div>
+    <div class="panel-sub" style="margin:10px 0 0">Arah menunjukkan asal datangnya angin (konvensi meteorologi).</div>
+  </aside>
+</div>
+
+<!-- Ilustrasi 3D AWS -->
+        <section class="aws-scene-card" aria-labelledby="awsSceneTitle">
+            <div class="aws-scene-head">
+                <div>
+                    <div class="aws-scene-title" id="awsSceneTitle"><i class="fas fa-cubes"></i> Visual 3D Automatic Weather Station</div>
+                    <div class="aws-scene-subtitle">Susunan komponen taman alat dan sistem catu daya mandiri &middot; seret untuk memutar, scroll untuk zoom, klik gerbang untuk membuka</div>
+                </div>
+                <span class="scene-tag"><i class="fas fa-circle" style="font-size:7px;margin-right:5px"></i> Model 3D interaktif</span>
+            </div>
+            <div class="aws-scene-3d" id="awsScene3d" role="img" aria-label="Model 3D interaktif taman alat AWS berpagar dengan sensor cuaca, panel surya, serta kotak daya berisi solar regulator dan baterai 28 ampere jam">
+                <canvas id="awsCanvas"></canvas>
+                <div id="awsLabels"></div>
+                <svg class="aws-line-layer" aria-hidden="true"><line id="awsLine" x1="0" y1="0" x2="0" y2="0" style="display:none"/></svg>
+                <div id="awsMarker" class="aws-marker" style="display:none"><span></span></div>
+                <div id="awsReading" class="aws-reading" style="display:none" aria-live="polite">
+                    <div id="awsReadingTitle" class="aws-reading-title">PEMBACAAN SENSOR</div>
+                    <div id="awsReadingValue" class="aws-reading-value">--</div>
+                    <div id="awsReadingInfo" class="aws-reading-info"></div>
+                </div>
+            </div>
+            <div class="scene-panels" aria-label="Geser posisi tampilan 3D">
+                <div class="scene-pan"><label for="scenePanY"><i class="fas fa-arrows-up-down"></i>Atas / bawah</label><input id="scenePanY" type="range" min="0" max="100" value="50" aria-label="Geser tampilan ke atas atau bawah"><small>↕</small></div>
+                <div class="scene-pan"><label for="scenePanX"><i class="fas fa-arrows-left-right"></i>Kiri / kanan</label><input id="scenePanX" type="range" min="0" max="100" value="50" aria-label="Geser tampilan ke kiri atau kanan"><small>↔</small></div>
+            </div>
+            <div class="scene-foot" aria-label="Pilih sensor untuk melihat lokasinya dan nilai saat ini">
+                <button type="button" data-scene-sensor="wind"><i class="fas fa-wind"></i>Angin</button>
+                <button type="button" data-scene-sensor="air"><i class="fas fa-temperature-half"></i>Suhu &amp; RH</button>
+                <button type="button" data-scene-sensor="rain"><i class="fas fa-cloud-rain"></i>Hujan</button>
+                <button type="button" data-scene-sensor="solar"><i class="fas fa-sun"></i>Radiasi</button>
+                <button type="button" data-scene-sensor="power"><i class="fas fa-battery-three-quarters"></i>Catu daya</button>
+                <button type="button" id="awsBtnLabels" class="active" aria-pressed="true"><i class="fas fa-tag"></i>Label</button>
+                <button type="button" id="awsBtnRotate" aria-pressed="false"><i class="fas fa-rotate"></i>Putar otomatis</button>
+                <button type="button" id="awsBtnTour" aria-pressed="false"><i class="fas fa-route"></i>Tur + inspeksi</button>
+                <button type="button" id="awsBtnReset"><i class="fas fa-expand"></i>Tampilan awal</button>
+                <button type="button" id="awsBtnGate" aria-pressed="false"><i class="fas fa-door-closed"></i>Buka gerbang</button>
+            </div>
+        </section>
+
+        
+<div class="charts">
+  <section class="chart-card wide">
+    <div class="chart-head">
+      <div class="chart-title"><i class="fas fa-chart-line"></i> Tren suhu &amp; kelembapan, 4 jam terakhir (UTC)</div>
+      <div class="legend"><span><i style="background:var(--c-temp)"></i>Suhu (°C)</span><span><i style="background:var(--c-hum)"></i>Kelembapan (%)</span></div>
+    </div>
+    <div class="chart" id="ch-th"></div>
+  </section>
+  <section class="chart-card">
+    <div class="chart-head"><div class="chart-title"><i class="fas fa-wind"></i> Kecepatan angin (km/h)</div></div>
+    <div class="chart" id="ch-wind"></div>
+  </section>
+  <section class="chart-card">
+    <div class="chart-head"><div class="chart-title"><i class="fas fa-gauge-high"></i> Tekanan udara (hPa)</div></div>
+    <div class="chart" id="ch-pres"></div>
+  </section>
+</div>
+
+<section class="table-card">
+  <div class="table-head">
+    <div class="chart-title"><i class="fas fa-table"></i> Data pengamatan terbaru (interval 10 menit)</div>
+    <button class="btn" id="csvBtn" type="button"><i class="fas fa-download"></i> Unduh CSV</button>
+  </div>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>Waktu (UTC)</th><th>Suhu (°C)</th><th>Kelembapan (%)</th><th>Angin (km/h)</th><th>Arah</th><th>Tekanan (hPa)</th><th>Hujan (mm)</th><th>Radiasi (W/m²)</th><th>Status</th></tr></thead>
+      <tbody id="dataTable"></tbody>
+    </table>
+  </div>
+</section>
+<div class="footer">&copy; <span id="yr">2024</span> AWS MIT (M. Taufik, Idris dan Toni Satria) | Sistem Monitoring AWS | Pembaruan data setiap 10 menit</div>
+</div>
+
+<script>
+const UPDATE_INTERVAL_MS=10*60*1000,N=24,TABLE_ROWS=12;
+let current={temp:28.5,humidity:78,wind:12.4,windDir:245,pressure:1012.8,rain:3.2,solar:682};
+let previous={...current};
+const series={temp:[],humidity:[],wind:[],windDir:[],pressure:[],rain:[],solar:[]};
+let times=[];
+const roundTo=(n,d=1)=>Math.round(n*10**d)/10**d;
+const pad=n=>String(n).padStart(2,'0');
+const hhmm=d=>pad(d.getUTCHours())+':'+pad(d.getUTCMinutes());
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const f1=n=>n.toFixed(1);
+function drift(v,m,min,max){let x=v+(Math.random()*2-1)*m;if(x<min)x=min+Math.random()*m*.5;if(x>max)x=max-Math.random()*m*.5;return x}
+const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+function degreesToCompass(deg){return DIRS[Math.round(deg/22.5)%16]}
+const BF_MAX=[1,5,11,19,28,38,49,61,74,88,102,117];
+const BF_TXT=['Tenang','Udara ringan','Angin lemah','Angin lembut','Angin sedang','Angin agak kuat','Angin kuat','Angin kencang','Angin sangat kencang','Badai','Badai kuat','Badai dahsyat','Topan'];
+function beaufort(k){const i=BF_MAX.findIndex(m=>k<m);return i<0?12:i}
+
+/* ===== Data ===== */
+function initSeries(){
+  const now=Date.now();
+  times=Array.from({length:N},(_,i)=>new Date(now-(N-1-i)*UPDATE_INTERVAL_MS));
+  const walk=(cur,d,lo,hi,r=1)=>{const a=[cur];for(let i=1;i<N;i++)a.unshift(roundTo(drift(a[0],d,lo,hi),r));return a};
+  series.temp=walk(current.temp,.6,18,35);
+  series.humidity=walk(current.humidity,2.5,40,98,0);
+  series.wind=walk(current.wind,2,0,35);
+  series.pressure=walk(current.pressure,.5,1000,1020);
+  series.solar=walk(current.solar,60,50,1100,0);
+  series.rain=Array.from({length:N},()=>roundTo(Math.random()<.6?0:Math.random()*6));
+  series.rain[N-1]=current.rain;
+  let d=current.windDir;series.windDir=[d];
+  for(let i=1;i<N;i++){d=(d+Math.round(Math.random()*20-10)+360)%360;series.windDir.unshift(d)}
+  ['temp','humidity','pressure','solar','wind'].forEach(k=>previous[k]=series[k][N-2]);
+}
+function generateNewValues(){
+  previous={...current};
+  current.temp=roundTo(drift(current.temp,.8,18,35));
+  current.humidity=Math.round(drift(current.humidity,3,40,98));
+  current.wind=roundTo(drift(current.wind,2,0,35));
+  current.windDir=(Math.round(current.windDir+Math.random()*30-15)+360)%360;
+  current.pressure=roundTo(drift(current.pressure,.8,1000,1020));
+  current.rain=roundTo(Math.random()<.6?0:Math.random()*8);
+  const h=new Date().getUTCHours();
+  current.solar=(h>=22||h<=11)?Math.round(drift(current.solar,80,50,1100)):Math.round(Math.random()*5);
+  times.push(new Date());
+  Object.keys(series).forEach(k=>series[k].push(current[k]));
+  if(times.length>N){times.shift();Object.values(series).forEach(a=>a.shift())}
+}
+
+/* ===== Kartu parameter ===== */
+const CARDS=[
+  {k:'temp',g:'grp-atm',lbl:'Suhu udara',u:'°C',ic:'fa-temperature-half',c:'--c-temp',d:1,du:' °C'},
+  {k:'humidity',g:'grp-atm',lbl:'Kelembapan',u:'%',ic:'fa-droplet',c:'--c-hum',d:0,du:'%'},
+  {k:'pressure',g:'grp-atm',lbl:'Tekanan udara',u:'hPa',ic:'fa-gauge-high',c:'--c-pres',d:1,du:' hPa'},
+  {k:'rain',g:'grp-pre',lbl:'Curah hujan',u:'mm',ic:'fa-cloud-rain',c:'--c-rain',d:1},
+  {k:'solar',g:'grp-pre',lbl:'Radiasi matahari',u:'W/m²',ic:'fa-sun',c:'--c-solar',d:0,du:' W/m²'}
+];
+function buildCards(){
+  CARDS.forEach(c=>document.getElementById(c.g).insertAdjacentHTML('beforeend',
+  `<div class="card" id="card-${c.k}" style="--ac:var(${c.c})"><div class="card-top"><span class="ico"><i class="fas ${c.ic}"></i></span><span class="lbl">${c.lbl}</span><span class="badge" id="bd-${c.k}"></span></div><div class="val" id="v-${c.k}"></div><div class="bar" id="bar-${c.k}"><i></i></div><div class="meta"><span id="tr-${c.k}"></span><span id="ex-${c.k}"></span></div><svg class="spark" id="sp-${c.k}" viewBox="0 0 120 34" preserveAspectRatio="none" aria-hidden="true"></svg></div>`));
+}
+function info(k){
+  const c=current,s=series;
+  if(k==='temp'){const e=c.humidity/100*6.105*Math.exp(17.27*c.temp/(237.7+c.temp)),at=c.temp+.33*e-.7*c.wind/3.6-4;return{b:c.temp<24?'Sejuk':c.temp<=31?'Normal':'Panas',ex:`Terasa ${f1(at)} °C`}}
+  if(k==='humidity'){const g=Math.log(c.humidity/100)+17.62*c.temp/(243.12+c.temp),td=243.12*g/(17.62-g);return{b:c.humidity<40?'Kering':c.humidity<=70?'Nyaman':'Lembap',ex:`Titik embun ${f1(td)} °C`,bar:c.humidity}}
+  if(k==='pressure'){const d=c.pressure-s.pressure[Math.max(0,s.pressure.length-7)];return{b:c.pressure<1005?'Rendah':c.pressure>1020?'Tinggi':'Normal',ex:`1 jam: ${d>=0?'+':''}${f1(d)} hPa`}}
+  if(k==='rain'){const r=c.rain,h=s.rain.slice(-6).reduce((a,b)=>a+b,0);return{b:r===0?'Tidak hujan':r<.4?'Ringan':r<1.3?'Sedang':'Lebat',ex:`1 jam: ${f1(h)} mm`,bar:r/8*100}}
+  const v=c.solar;return{b:v<100?'Rendah':v<=500?'Sedang':v<=800?'Tinggi':'Sangat tinggi',ex:`Puncak: ${Math.max(...s.solar)} W/m²`,bar:v/1200*100}
+}
+function trendHTML(k,u){
+  const d=roundTo(current[k]-previous[k],k==='solar'||k==='humidity'?0:1);
+  const t=' <span class="flat">/ 10 mnt</span>';
+  if(Math.abs(d)<.05)return '<span class="flat"><i class="fas fa-minus"></i> Stabil</span>';
+  return d>0?`<span class="up"><i class="fas fa-arrow-up"></i> +${d}${u}</span>${t}`:`<span class="down"><i class="fas fa-arrow-down"></i> ${d}${u}</span>${t}`;
+}
+function spark(data,col){
+  const mn=Math.min(...data),mx=Math.max(...data),r=(mx-mn)||1;
+  const l=data.map((v,i)=>`${i?'L':'M'}${f1(i/(data.length-1)*120)} ${f1(30-(v-mn)/r*26)}`).join('');
+  return `<path d="${l}L120 34L0 34Z" style="fill:${col};opacity:.14"/><path d="${l}" fill="none" stroke-width="1.8" vector-effect="non-scaling-stroke" stroke-linejoin="round" style="stroke:${col}"/>`;
+}
+function renderCards(){
+  CARDS.forEach(c=>{
+    const i=info(c.k),v=document.getElementById('v-'+c.k),bar=document.getElementById('bar-'+c.k);
+    v.innerHTML=`${current[c.k].toFixed(c.d)}<small>${c.u}</small>`;
+    v.classList.remove('flash');void v.offsetWidth;v.classList.add('flash');
+    document.getElementById('bd-'+c.k).textContent=i.b;
+    document.getElementById('tr-'+c.k).innerHTML=c.k==='rain'?'<span class="flat"><i class="fas fa-clock"></i> Per 10 menit</span>':trendHTML(c.k,c.du);
+    document.getElementById('ex-'+c.k).textContent=i.ex;
+    bar.style.display=i.bar==null?'none':'block';
+    if(i.bar!=null)bar.firstElementChild.style.width=Math.min(100,i.bar)+'%';
+    document.getElementById('sp-'+c.k).innerHTML=spark(series[c.k],`var(${c.c})`);
+  });
+}
+
+/* ===== Kompas ===== */
+const polar=(r,d)=>{const a=(d-90)*Math.PI/180;return[170+r*Math.cos(a),170+r*Math.sin(a)]};
+function buildCompass(){
+  let s='<circle cx="170" cy="170" r="160" class="cp-bg"/><circle cx="170" cy="170" r="108" class="cp-ring"/>';
+  for(let d=0;d<360;d+=10){const m=d%30===0,a=polar(150,d),b=polar(m?138:144,d);s+=`<line class="cp-tick${m?' maj':''}" x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}"/>`}
+  for(let d=30;d<360;d+=30){if(d%90===0)continue;const p=polar(126,d);s+=`<text class="cp-deg" x="${f1(p[0])}" y="${f1(p[1])}">${d}</text>`}
+  [['N',0],['E',90],['S',180],['W',270]].forEach(([t,d])=>{const p=polar(126,d);s+=`<text class="cp-card" ${t==='N'?'style="fill:var(--north)"':''} x="${f1(p[0])}" y="${f1(p[1])}">${t}</text>`});
+  for(let i=0;i<16;i++){if(i%4===0)continue;const p=polar(95,i*22.5);s+=`<text class="cp-sec${i%2?'':' b'}" x="${f1(p[0])}" y="${f1(p[1])}">${DIRS[i]}</text>`}
+  const pts=[];for(let i=0;i<16;i++)pts.push(polar(i%2?20:(i%4===0?78:52),i*22.5).map(f1).join(','));
+  s+=`<polygon class="cp-star" points="${pts.join(' ')}"/>`;
+  s+='<g id="needle"><path d="M170 82L178 170L162 170Z" style="fill:var(--c-wind)"/><path d="M162 170L178 170L170 226Z" style="fill:var(--text-3);opacity:.5"/></g>';
+  s+='<circle class="cp-hub" cx="170" cy="170" r="27"/><text class="cp-dir" id="cp-dir" x="170" y="165">--</text><text class="cp-dd" id="cp-dd" x="170" y="181">--</text>';
+  document.getElementById('compass').innerHTML=s;
+}
+let needleAng=null;
+function renderCompass(){
+  const t=current.windDir,dir=degreesToCompass(t);
+  if(needleAng===null)needleAng=t;else needleAng+=((((t-needleAng)%360)+540)%360)-180;
+  document.getElementById('needle').style.transform=`rotate(${needleAng}deg)`;
+  document.getElementById('cp-dir').textContent=dir;
+  document.getElementById('cp-dd').textContent=t+'°';
+  document.getElementById('cp-caption').textContent=`Angin dari ${dir} (${t}°)`;
+  const w6=series.wind.slice(-6),d6=series.windDir.slice(-6),b=beaufort(current.wind);
+  const sx=d6.reduce((a,d)=>a+Math.sin(d*Math.PI/180),0),sy=d6.reduce((a,d)=>a+Math.cos(d*Math.PI/180),0);
+  const avg=Math.round((Math.atan2(sx,sy)*180/Math.PI+360)%360);
+  document.getElementById('st-speed').textContent=f1(current.wind)+' km/h';
+  document.getElementById('st-ms').textContent=f1(current.wind/3.6)+' m/s';
+  document.getElementById('st-bf').textContent='Bf '+b;
+  document.getElementById('st-bft').textContent=BF_TXT[b];
+  document.getElementById('st-gust').textContent=f1(Math.max(...w6))+' km/h';
+  document.getElementById('st-avg').textContent=`${avg}° ${degreesToCompass(avg)}`;
+}
+
+/* ===== Grafik ===== */
+const CH={
+  'ch-th':{h:260,series:[{k:'temp',c:'--c-temp',fill:1,lbl:'Suhu',u:'°C',d:1},{k:'humidity',c:'--c-hum',ax:'r',lbl:'Kelembapan',u:'%',d:0}]},
+  'ch-wind':{h:200,min0:1,series:[{k:'wind',c:'--c-wind',fill:1,lbl:'Angin',u:'km/h',d:1}]},
+  'ch-pres':{h:200,series:[{k:'pressure',c:'--c-pres',fill:1,lbl:'Tekanan',u:'hPa',d:1}]}
+};
+function drawChart(id,cfg){
+  if(!times.length)return;
+  const el=document.getElementById(id),w=el.clientWidth||600,h=cfg.h,m={l:42,r:cfg.series.some(s=>s.ax==='r')?42:12,t:10,b:24},n=times.length,ih=h-m.t-m.b,rng={};
+  const X=i=>m.l+i*(w-m.l-m.r)/(n-1);
+  ['l','r'].forEach(ax=>{const ss=cfg.series.filter(s=>(s.ax||'l')===ax);if(!ss.length)return;const v=ss.flatMap(s=>series[s.k]);let lo=Math.min(...v),hi=Math.max(...v);const p=(hi-lo)*.2||1;lo-=p;hi+=p;if(cfg.min0&&ax==='l')lo=Math.max(0,lo);rng[ax]={lo,hi,d:ss[0].d}});
+  const Y=(ax,v)=>m.t+(1-(v-rng[ax].lo)/(rng[ax].hi-rng[ax].lo))*ih;
+  let s='<defs>';
+  cfg.series.forEach(q=>{const c=cssv(q.c);s+=`<linearGradient id="g-${id}-${q.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".3"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient>`});
+  s+='</defs>';
+  for(let i=0;i<=4;i++){
+    const y=m.t+i*ih/4;
+    s+=`<line x1="${m.l}" x2="${w-m.r}" y1="${y}" y2="${y}" style="stroke:var(--border)"/>`;
+    ['l','r'].forEach(ax=>{if(!rng[ax])return;const r=rng[ax];s+=`<text x="${ax==='l'?m.l-8:w-m.r+8}" y="${y}" text-anchor="${ax==='l'?'end':'start'}" dominant-baseline="central" style="fill:var(--text-3);font:10px var(--mono)">${(r.hi-i/4*(r.hi-r.lo)).toFixed(r.d)}</text>`});
+  }
+  [0,6,12,18,n-1].forEach((i,j,a)=>{s+=`<text x="${X(i)}" y="${h-6}" text-anchor="${j===a.length-1?'end':'middle'}" style="fill:var(--text-3);font:10px var(--mono)">${hhmm(times[i])}</text>`});
+  cfg.series.forEach(q=>{
+    const ax=q.ax||'l',p=series[q.k].map((v,i)=>`${i?'L':'M'}${f1(X(i))} ${f1(Y(ax,v))}`).join('');
+    if(q.fill)s+=`<path d="${p}L${f1(X(n-1))} ${m.t+ih}L${f1(X(0))} ${m.t+ih}Z" fill="url(#g-${id}-${q.k})"/>`;
+    s+=`<path d="${p}" fill="none" stroke="${cssv(q.c)}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+  s+=`<line class="xh" y1="${m.t}" y2="${m.t+ih}" style="stroke:var(--text-3);stroke-dasharray:3 3;display:none"/>`;
+  cfg.series.forEach(q=>s+=`<circle class="hd" r="4" style="fill:${cssv(q.c)};stroke:var(--surface);stroke-width:2;display:none"/>`);
+  el.innerHTML=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${s}</svg><div class="tip"></div>`;
+  el._st={w,m,X,Y,cfg};
+  if(!el._b){
+    el._b=1;
+    el.addEventListener('pointermove',e=>{
+      const st=el._st,nn=times.length;
+      let i=Math.round((e.clientX-el.getBoundingClientRect().left-st.m.l)/(st.w-st.m.l-st.m.r)*(nn-1));
+      i=Math.max(0,Math.min(nn-1,i));
+      const xh=el.querySelector('.xh'),dots=el.querySelectorAll('.hd'),tip=el.querySelector('.tip'),x=st.X(i);
+      xh.setAttribute('x1',x);xh.setAttribute('x2',x);xh.style.display='block';
+      let html=`<b>${hhmm(times[i])} UTC</b>`;
+      st.cfg.series.forEach((q,j)=>{dots[j].setAttribute('cx',x);dots[j].setAttribute('cy',st.Y(q.ax||'l',series[q.k][i]));dots[j].style.display='block';html+=`<div><i style="background:${cssv(q.c)}"></i>${q.lbl}: <span class="mono">${series[q.k][i].toFixed(q.d)} ${q.u}</span></div>`});
+      tip.innerHTML=html;tip.style.display='block';
+      const tw=tip.offsetWidth;tip.style.left=(x+14+tw>st.w?x-14-tw:x+14)+'px';
+    });
+    el.addEventListener('pointerleave',()=>{el.querySelectorAll('.xh,.hd').forEach(n=>n.style.display='none');el.querySelector('.tip').style.display='none'});
+    new ResizeObserver(()=>{if(el.clientWidth!==el._w){el._w=el.clientWidth;drawChart(id,cfg)}}).observe(el);
+  }
+}
+const renderCharts=()=>Object.keys(CH).forEach(id=>drawChart(id,CH[id]));
+
+/* ===== Tabel & CSV ===== */
+function renderTable(){
+  const rows=[];
+  for(let i=times.length-1;i>=Math.max(0,times.length-TABLE_ROWS);i--){
+    const d=series.windDir[i];
+    rows.push(`<tr${i===times.length-1?' class="new"':''}><td>${hhmm(times[i])}</td><td>${f1(series.temp[i])}</td><td>${series.humidity[i]}</td><td>${f1(series.wind[i])}</td><td><span class="chip dir">${d}° ${degreesToCompass(d)}</span></td><td>${f1(series.pressure[i])}</td><td>${f1(series.rain[i])}</td><td>${series.solar[i]}</td><td><span class="chip">Normal</span></td></tr>`);
+  }
+  document.getElementById('dataTable').innerHTML=rows.join('');
+}
+function downloadCSV(){
+  const r=['waktu_utc,suhu_c,kelembapan_persen,angin_kmh,arah_derajat,arah_mata_angin,tekanan_hpa,hujan_mm,radiasi_wm2'];
+  for(let i=times.length-1;i>=0;i--)r.push([times[i].toISOString(),series.temp[i],series.humidity[i],series.wind[i],series.windDir[i],degreesToCompass(series.windDir[i]),series.pressure[i],series.rain[i],series.solar[i]].join(','));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.join('\n')],{type:'text/csv'}));a.download='aws-mit-data.csv';a.click();URL.revokeObjectURL(a.href);
+}
+document.getElementById('csvBtn').addEventListener('click',downloadCSV);
+
+/* ===== Interaksi visual 3D ===== */
+const sceneSensors={
+  wind:{title:'ANGIN · KECEPATAN / ARAH',value:()=>`${current.wind.toFixed(1)} km/h · ${current.windDir}° ${degreesToCompass(current.windDir)}`,info:'Merk: Thies Clima\nSN: TC-WD-7K4M-26'},
+  air:{title:'SUHU · KELEMBAPAN (TRH)',value:()=>`${current.temp.toFixed(1)} °C · ${current.humidity}% RH`,info:'Merk: Thies Clima\nSN: TC-TRH-29A6-26'},
+  rain:{title:'CURAH HUJAN · 10 MENIT',value:()=>`${current.rain.toFixed(1)} mm`,info:'Merk: TB4 Hygro\nSN: TB4H-8Q2N-26'},
+  solar:{title:'RADIASI MATAHARI (SR)',value:()=>`${current.solar} W/m²`,info:'Merk: Thies Clima\nSN: TC-SR-5P8D-26'},
+  power:{title:'SISTEM CATU DAYA',value:()=>'Solar regulator · baterai 28 Ah',info:'Merk: SolarView\nSN: SV-PV-3M7K-26'}
+};
+let activeSceneSensor=null;
+let cameraTourToken=0,cameraTourActive=false;
+const cameraTourButton=document.getElementById('awsBtnTour');
+function stopTourSpeech(){if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+function speakTour(text){
+  if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined')return Promise.resolve();
+  return new Promise(resolve=>{
+    const synth=window.speechSynthesis;
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang='id-ID';utterance.rate=.94;utterance.pitch=1;utterance.volume=1;
+    const voice=synth.getVoices().find(v=>/^id(-|$)/i.test(v.lang));
+    if(voice)utterance.voice=voice;
+    let finished=false,guard;
+    const done=()=>{if(finished)return;finished=true;clearTimeout(guard);resolve()};
+    const waitForIdle=()=>{
+      if(finished)return;
+      if(!synth.speaking&&!synth.pending){setTimeout(done,350);return;}
+      setTimeout(waitForIdle,180);
+    };
+    utterance.onend=waitForIdle;
+    utterance.onerror=waitForIdle;
+    guard=setTimeout(()=>{stopTourSpeech();done()},45000);
+    synth.speak(utterance);
+  });
+}
+async function narrateTourStep(text,minDuration=8200){
+  const started=performance.now();
+  await speakTour(text);
+  const wait=minDuration-(performance.now()-started);
+  if(wait>0)await new Promise(resolve=>setTimeout(resolve,wait));
+}
+function sensorNarration(key){
+  if(key==='wind')return `Sensor angin Thies Clima mengukur kecepatan dan arah angin. Saat ini kecepatannya ${current.wind.toFixed(1)} kilometer per jam, dari arah ${degreesToCompass(current.windDir)}. Cawan anemometer berputar mengikuti angin.`;
+  if(key==='air')return `Sensor suhu dan kelembapan relatif Thies Clima, atau TRH, memantau kondisi udara. Pembacaan saat ini ${current.temp.toFixed(1)} derajat Celsius dengan kelembapan ${current.humidity} persen.`;
+  if(key==='rain')return `Penakar hujan TB4 Hygro mengukur curah hujan menggunakan mekanisme tipping bucket. Curah hujan pada pembacaan ini ${current.rain.toFixed(1)} milimeter.`;
+  if(key==='solar')return `Sensor radiasi matahari Thies Clima mengukur energi surya yang diterima. Nilai saat ini ${current.solar} watt per meter persegi.`;
+  return 'Sistem catu daya menggunakan panel surya SolarView. Energi disalurkan melalui regulator dan disimpan pada baterai di dalam kotak daya yang tertutup.';
+}
+function showSceneSensor(key,fromTour=false){
+  if(cameraTourActive&&!fromTour)stopCameraTour(false);
+  const sensor=sceneSensors[key];
+  if(!sensor||!window.AWS3D)return;
+  activeSceneSensor=key;
+  document.querySelectorAll('[data-scene-sensor]').forEach(b=>{const on=b.dataset.sceneSensor===key;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
+  window.AWS3D.focus(key,sensor.title,sensor.value(),sensor.info,fromTour?1.45:3.5);
+}
+function finishCameraTourUi(){cameraTourActive=false;cameraTourButton.classList.remove('active');cameraTourButton.setAttribute('aria-pressed','false');cameraTourButton.innerHTML='<i class="fas fa-route"></i>Tur + inspeksi'}
+function stopCameraTour(resetView){
+  cameraTourToken++;
+  stopTourSpeech();
+  if(window.AWS3D)window.AWS3D.cancelTechnician();
+  finishCameraTourUi();
+  if(resetView&&window.AWS3D){activeSceneSensor=null;document.querySelectorAll('[data-scene-sensor]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false')});window.AWS3D.reset(1.45)}
+}
+async function startCameraTour(){
+  if(!window.AWS3D)return;
+  const token=++cameraTourToken,keys=['wind','air','rain','solar','power'];
+  cameraTourActive=true;cameraTourButton.classList.add('active');cameraTourButton.setAttribute('aria-pressed','true');
+  stopTourSpeech();
+  await speakTour('Tur lokasi stasiun cuaca otomatis dimulai. Kita akan melihat sensor cuaca dan sistem catu dayanya.');
+  if(token!==cameraTourToken)return;
+  for(let i=0;i<keys.length;i++){
+    if(token!==cameraTourToken)return;
+    cameraTourButton.innerHTML=`<i class="fas fa-route"></i>Tur ${i+1}/${keys.length}`;
+    showSceneSensor(keys[i],true);
+    await narrateTourStep(sensorNarration(keys[i]));
+  }
+  if(token!==cameraTourToken)return;
+  activeSceneSensor=null;
+  document.querySelectorAll('[data-scene-sensor]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false')});
+  window.AWS3D.reset(1.45);
+  cameraTourButton.innerHTML='<i class="fas fa-route"></i>Kembali ke awal…';
+  await narrateTourStep('Tur sensor selesai. Kamera kembali ke tampilan keseluruhan. Teknisi akan masuk untuk memeriksa peralatan.',4200);
+  if(token!==cameraTourToken)return;
+  await window.AWS3D.runTechnician(status=>{
+    if(token!==cameraTourToken)return;
+    cameraTourButton.innerHTML=`<i class="fas fa-route"></i>${status}`;
+    if(status.startsWith('Teknisi menuju taman alat'))speakTour('Teknisi membuka gerbang dan berjalan menuju taman alat untuk melakukan pemeriksaan.');
+    else if(status.startsWith('Pemeriksaan selesai, teknisi kembali'))speakTour('Pemeriksaan peralatan selesai. Teknisi berjalan kembali dan menutup gerbang.');
+  });
+  if(token===cameraTourToken)finishCameraTourUi();
+}
+cameraTourButton.addEventListener('click',()=>cameraTourActive?stopCameraTour(true):startCameraTour());
+document.querySelectorAll('[data-scene-sensor]').forEach(b=>{b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>showSceneSensor(b.dataset.sceneSensor))});
+function refreshSceneReading(){if(activeSceneSensor&&window.AWS3D)window.AWS3D.setReading(sceneSensors[activeSceneSensor].value())}
+
+/* ===== Jam, countdown, tema ===== */
+let nextUpdateTime=Date.now()+UPDATE_INTERVAL_MS;
+function tick(){
+  const n=new Date(),w=new Date(n.getTime()+7*36e5),T=d=>`${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  document.getElementById('t-utc').textContent=T(n);
+  document.getElementById('t-wib').textContent=T(w);
+  const D=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],M=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  document.getElementById('date-display').textContent=`${D[n.getUTCDay()]}, ${n.getUTCDate()} ${M[n.getUTCMonth()]} ${n.getUTCFullYear()}`;
+  const rem=Math.max(0,nextUpdateTime-Date.now()),s=Math.floor(rem/1000);
+  document.getElementById('countdown').textContent=`${pad(Math.floor(s/60))}:${pad(s%60)}`;
+  document.getElementById('progressBar').style.width=(100-rem/UPDATE_INTERVAL_MS*100)+'%';
+}
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  document.getElementById('themeBtn').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+  try{localStorage.setItem('aws-theme',t)}catch(e){}
+  if(times.length){renderCards();renderCharts()}
+}
+document.getElementById('themeBtn').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+
+/* ===== Main ===== */
+function performUpdate(){
+  generateNewValues();renderCards();renderCompass();refreshSceneReading();renderTable();renderCharts();
+  nextUpdateTime=Date.now()+UPDATE_INTERVAL_MS;
+}
+function init(){
+  let t='dark';try{t=localStorage.getItem('aws-theme')||'dark'}catch(e){}
+  document.documentElement.dataset.theme=t;
+  document.getElementById('themeBtn').innerHTML=t==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  initSeries();buildCards();buildCompass();
+  renderCards();renderCompass();renderTable();renderCharts();tick();
+  setInterval(tick,1000);
+  setInterval(performUpdate,UPDATE_INTERVAL_MS);
+}
+init();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+(function () {
+    const wrap = document.getElementById('awsScene3d');
+    if (!wrap) return;
+    if (typeof THREE === 'undefined' || !THREE.OrbitControls) {
+        wrap.insertAdjacentHTML('beforeend', '<div class="aws-fallback">Model 3D tidak dapat dimuat. Periksa koneksi internet Anda.</div>');
+        return;
+    }
+
+    const canvas = document.getElementById('awsCanvas');
+    const labelsEl = document.getElementById('awsLabels');
+    const marker = document.getElementById('awsMarker');
+    const card = document.getElementById('awsReading');
+    const cardTitle = document.getElementById('awsReadingTitle');
+    const cardValue = document.getElementById('awsReadingValue');
+    const cardInfo = document.getElementById('awsReadingInfo');
+    const lineEl = document.getElementById('awsLine');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    const home = { p: V(6.4, 3.6, 8.4), t: V(0, 2.1, 0) };
+    camera.position.copy(home.p);
+
+    const controls = new THREE.OrbitControls(camera, canvas);
+    controls.target.copy(home.t);
+    controls.enableDamping = true;
+    controls.minDistance = 1.5;
+    controls.maxDistance = 22;
+    controls.maxPolarAngle = Math.PI * 0.495;
+    controls.autoRotateSpeed = 1.2;
+
+    scene.add(new THREE.HemisphereLight(0xdce9ff, 0x2a5a60, 0.8));
+    const sun = new THREE.DirectionalLight(0xfff3df, 0.95);
+    sun.position.set(7, 11, 6);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    const sc = sun.shadow.camera;
+    sc.left = -7; sc.right = 7; sc.top = 7; sc.bottom = -7; sc.near = 1; sc.far = 35;
+    sun.shadow.bias = -0.0006;
+    scene.add(sun);
+
+    const M = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0.1 }, o || {}));
+    const metal = M(0xc3c8cb, { metalness: 0.7, roughness: 0.35 });
+    const white = M(0xf2f2f0, { roughness: 0.5 });
+    const dark = M(0x222426, { roughness: 0.7 });
+    const concrete = M(0xa9a9a4, { roughness: 0.95 });
+    const grey = M(0x8a9094, { metalness: 0.4, roughness: 0.5 });
+
+    function add(parent, geo, mat, x, y, z, shadow) {
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(x || 0, y || 0, z || 0);
+        m.castShadow = shadow !== false;
+        m.receiveShadow = true;
+        parent.add(m);
+        return m;
+    }
+    function cyl(p, r, h, mat, x, y, z, seg) { return add(p, new THREE.CylinderGeometry(r, r, h, seg || 24), mat, x, y, z); }
+    function box(p, w, h, d, mat, x, y, z) { return add(p, new THREE.BoxGeometry(w, h, d), mat, x, y, z); }
+    function strut(a, b, r, mat) {
+        const d = new THREE.Vector3().subVectors(b, a);
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, d.length(), 10), mat);
+        m.position.copy(a).addScaledVector(d, 0.5);
+        m.quaternion.setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
+        m.castShadow = true;
+        scene.add(m);
+        return m;
+    }
+    function cable(pts, r) {
+        const c = new THREE.CatmullRomCurve3(pts.map(p => V(p[0], p[1], p[2])), false, 'catmullrom', 0.1);
+        scene.add(new THREE.Mesh(new THREE.TubeGeometry(c, 48, r || 0.006, 6, false), dark));
+    }
+
+    const ground = add(scene, new THREE.CircleGeometry(9, 64), M(0x1f5a5e, { roughness: 1, metalness: 0 }), 0, 0, 0, false);
+    ground.rotation.x = -Math.PI / 2;
+    const ring = new THREE.Mesh(new THREE.RingGeometry(8.85, 9, 96), new THREE.MeshBasicMaterial({ color: 0x4db6a8, transparent: true, opacity: 0.55 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.01; scene.add(ring);
+    function grassTexture() {
+        const c = document.createElement('canvas');
+        c.width = c.height = 512;
+        const g = c.getContext('2d');
+        g.fillStyle = '#52734c'; g.fillRect(0, 0, 512, 512);
+        let seed = 417;
+        const rand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+        for (let i = 0; i < 2800; i++) {
+            const shade = Math.floor(75 + rand() * 65);
+            g.strokeStyle = rand() > 0.5 ? `rgba(118,${shade},72,.24)` : `rgba(37,${shade - 8},45,.2)`;
+            g.lineWidth = 0.5 + rand() * 1.1;
+            const x = rand() * 512, y = rand() * 512;
+            g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rand() - 0.5) * 3, y - 1 - rand() * 3); g.stroke();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    const grass = new THREE.MeshStandardMaterial({ map: grassTexture(), roughness: 1, metalness: 0 });
+    const soilEdge = M(0x78796e, { roughness: 1, metalness: 0 });
+    box(scene, 5.4, 0.04, 5.4, [soilEdge, soilEdge, grass, soilEdge, soilEdge, soilEdge], 0, 0.02, 0);
+
+    // Siluet burung kecil yang melintas jauh di belakang area instrumen.
+    const birds = [];
+    const birdMat = new THREE.MeshBasicMaterial({ color: 0x26384b, side: THREE.DoubleSide });
+    function makeBird() {
+        const bird = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), birdMat);
+        body.scale.set(1.8, 0.55, 0.55);
+        bird.add(body);
+        const wingGeo = new THREE.BufferGeometry();
+        wingGeo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0, -0.27,0.11,0, -0.12,-0.015,0], 3));
+        wingGeo.computeVertexNormals();
+        const left = new THREE.Mesh(wingGeo, birdMat), right = new THREE.Mesh(wingGeo, birdMat);
+        left.position.x = -0.055; right.position.x = 0.055; right.scale.x = -1;
+        bird.add(left, right);
+        bird.userData.wings = [left, right];
+        bird.userData.visibleFrom = 0;
+        scene.add(bird);
+        birds.push(bird);
+    }
+    for (let i = 0; i < 3; i++) makeBird();
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) birds.forEach(b => { b.visible = false; });
+
+    const T = 4.17;
+    box(scene, 0.45, 0.1, 0.45, concrete, 0, 0.09, 0);
+    cyl(scene, 0.1, 0.015, metal, 0, 0.147, 0);
+    cyl(scene, 0.045, T - 0.14, metal, 0, (T + 0.14) / 2, 0, 32);
+    add(scene, new THREE.ConeGeometry(0.05, 0.05, 24), metal, 0, T + 0.02, 0);
+    [60, 180, 300].forEach(deg => {
+        const a = deg * Math.PI / 180, s = Math.sin(a), c = Math.cos(a);
+        strut(V(0, 1.05, 0), V(s * 0.7, 0.12, c * 0.7), 0.017, metal);
+        box(scene, 0.22, 0.08, 0.22, concrete, s * 0.7, 0.08, c * 0.7);
+        cyl(scene, 0.07, 0.012, metal, s * 0.7, 0.13, c * 0.7, 16);
+    });
+    cyl(scene, 0.03, 0.06, metal, 0, 1.05, 0, 16);
+
+    function clamp(y) { box(scene, 0.11, 0.07, 0.11, dark, 0, y, 0); }
+    cyl(scene, 0.007, 0.93, metal, 0, T + 0.47, 0, 10);
+    add(scene, new THREE.SphereGeometry(0.014, 12, 8), metal, 0, T + 0.94, 0);
+
+    const armY = 4.05;
+    clamp(armY);
+    strut(V(-0.7, armY, 0), V(0.7, armY, 0), 0.022, metal);
+
+    cyl(scene, 0.015, 0.2, metal, -0.6, armY + 0.1, 0, 12);
+    cyl(scene, 0.035, 0.09, M(0x30363a), -0.6, armY + 0.24, 0, 20);
+    const rotor = new THREE.Group();
+    rotor.position.set(-0.6, armY + 0.32, 0);
+    scene.add(rotor);
+    cyl(rotor, 0.022, 0.04, dark, 0, 0, 0, 16);
+    const cupMat = M(0xf4f4f2, { side: THREE.DoubleSide, roughness: 0.4 });
+    for (let i = 0; i < 3; i++) {
+        const g = new THREE.Group();
+        g.rotation.y = i * Math.PI * 2 / 3;
+        rotor.add(g);
+        const a = add(g, new THREE.CylinderGeometry(0.007, 0.007, 0.12, 8), metal, 0.06, 0, 0);
+        a.rotation.z = Math.PI / 2;
+        const cup = add(g, new THREE.SphereGeometry(0.045, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), cupMat, 0.125, 0, 0);
+        cup.rotation.x = Math.PI / 2;
+    }
+
+    cyl(scene, 0.015, 0.22, metal, 0.6, armY + 0.11, 0, 12);
+    cyl(scene, 0.03, 0.07, M(0x30363a), 0.6, armY + 0.24, 0, 20);
+    const vane = new THREE.Group();
+    vane.position.set(0.6, armY + 0.31, 0);
+    scene.add(vane);
+    const bm = add(vane, new THREE.CylinderGeometry(0.01, 0.01, 0.55, 10), M(0xe9eaea), 0.02, 0, 0);
+    bm.rotation.z = Math.PI / 2;
+    add(vane, new THREE.ConeGeometry(0.02, 0.07, 12), M(0xd9442b), 0.33, 0, 0).rotation.z = -Math.PI / 2;
+    add(vane, new THREE.SphereGeometry(0.022, 12, 8), M(0xd9442b), 0.30, 0, 0);
+    box(vane, 0.24, 0.17, 0.008, M(0xf4f4f2, { side: THREE.DoubleSide }), -0.2, 0.02, 0);
+    box(vane, 0.24, 0.012, 0.04, M(0xe9eaea), -0.2, 0.105, 0);
+
+    clamp(2.42);
+    strut(V(0, 2.42, 0.04), V(0, 2.42, 0.58), 0.02, metal);
+    cyl(scene, 0.012, 0.07, metal, 0, 2.45, 0.58, 10);
+    const sg = new THREE.Group();
+    sg.position.set(0, 2.2, 0.58);
+    scene.add(sg);
+    const louver = M(0xf8f8f6, { side: THREE.DoubleSide, roughness: 0.45 });
+    cyl(sg, 0.05, 0.30, M(0x4a4f53), 0, -0.01, 0, 16);
+    for (let i = 0; i < 8; i++) add(sg, new THREE.CylinderGeometry(0.068, 0.108, 0.022, 36, 1, true), louver, 0, 0.13 - i * 0.036, 0);
+    add(sg, new THREE.ConeGeometry(0.118, 0.05, 36), louver, 0, 0.175, 0);
+    cyl(sg, 0.095, 0.008, louver, 0, -0.17, 0, 36);
+
+    clamp(3.45);
+    strut(V(0.04, 3.45, 0), V(0.5, 3.45, 0), 0.016, metal);
+    const py = new THREE.Group();
+    py.position.set(0.5, 3.47, 0);
+    scene.add(py);
+    cyl(py, 0.065, 0.02, white, 0, 0, 0, 32);
+    cyl(py, 0.05, 0.05, white, 0, 0.035, 0, 32);
+    cyl(py, 0.028, 0.006, M(0x0b0b0b), 0, 0.063, 0, 24);
+    add(py, new THREE.SphereGeometry(0.036, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), M(0xbfd8e8, { transparent: true, opacity: 0.4, roughness: 0.1, metalness: 0.2 }), 0, 0.062, 0, false);
+    add(py, new THREE.CylinderGeometry(0.058, 0.058, 0.025, 32, 1, true), M(0xf4f4f2, { side: THREE.DoubleSide }), 0, 0.085, 0);
+
+    function solarTex() {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 384;
+        const g = c.getContext('2d');
+        g.fillStyle = '#b9bfc5'; g.fillRect(0, 0, 512, 384);
+        g.fillStyle = '#0f1a40'; g.fillRect(10, 10, 492, 364);
+        for (let r = 0; r < 4; r++) for (let k = 0; k < 6; k++) {
+            const x = 16 + k * 80.5, y = 16 + r * 88;
+            g.fillStyle = '#1d2f6b'; g.fillRect(x, y, 76, 84);
+            g.strokeStyle = 'rgba(185,200,235,0.28)'; g.lineWidth = 1;
+            for (let f = 4; f < 84; f += 5) { g.beginPath(); g.moveTo(x, y + f); g.lineTo(x + 76, y + f); g.stroke(); }
+            g.strokeStyle = 'rgba(215,225,245,0.8)'; g.lineWidth = 2;
+            [25, 51].forEach(o => { g.beginPath(); g.moveTo(x + o, y); g.lineTo(x + o, y + 84); g.stroke(); });
+        }
+        const t = new THREE.CanvasTexture(c);
+        t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        return t;
+    }
+    const panel = new THREE.Group();
+    panel.position.set(0, 3.0, -0.42);
+    panel.rotation.x = -0.45;
+    scene.add(panel);
+    const frameMat = M(0xb9bfc5, { metalness: 0.6, roughness: 0.4 });
+    const pMats = [frameMat, frameMat, M(0xffffff, { map: solarTex(), roughness: 0.25, metalness: 0.3 }), frameMat, frameMat, frameMat];
+    const pm = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.035, 0.55), pMats);
+    pm.castShadow = true; pm.receiveShadow = true;
+    panel.add(pm);
+    box(panel, 0.12, 0.03, 0.07, dark, 0, -0.03, -0.1);
+    scene.updateMatrixWorld(true);
+    [[-0.28, -0.2, 2.72], [0.28, -0.2, 2.72], [-0.28, 0.2, 3.22], [0.28, 0.2, 3.22]].forEach(s => {
+        const a = panel.localToWorld(V(s[0], -0.02, s[1]));
+        strut(V(0, s[2], 0), a, 0.01, metal);
+    });
+    box(scene, 0.1, 0.1, 0.02, dark, 0, 2.72, -0.03);
+    box(scene, 0.1, 0.1, 0.02, dark, 0, 3.22, -0.03);
+
+    box(scene, 0.3, 0.62, 0.02, grey, 0, 1.35, 0.07);
+    const enc = new THREE.Group();
+    enc.position.set(0, 1.35, 0.185);
+    scene.add(enc);
+    box(enc, 0.42, 0.52, 0.2, M(0xdcdfdf, { roughness: 0.5 }), 0, 0, 0);
+    box(enc, 0.4, 0.5, 0.01, M(0xe8ebeb, { roughness: 0.45 }), 0, 0, 0.105);
+    box(enc, 0.025, 0.1, 0.02, dark, 0.17, 0, 0.12);
+    [0.18, -0.18].forEach(y => cyl(enc, 0.008, 0.07, metal, -0.2, y, 0.11, 8));
+    box(enc, 0.1, 0.06, 0.004, M(0xf1c40f), -0.1, 0.14, 0.112);
+    const vis = box(enc, 0.46, 0.01, 0.27, M(0xc9cdcd), 0, 0.265, 0.02);
+    vis.rotation.x = 0.08;
+    [-0.1, 0, 0.1].forEach(x => cyl(enc, 0.018, 0.05, dark, x, -0.285, 0, 12));
+    cyl(enc, 0.022, 0.035, M(0xf4f4f2), 0.15, 0.283, -0.02, 16);
+    cyl(enc, 0.007, 0.36, M(0xf4f4f2), 0.15, 0.46, -0.02, 8);
+    add(enc, new THREE.SphereGeometry(0.01, 8, 8), M(0xf4f4f2), 0.15, 0.64, -0.02);
+
+    cable([[0, 1.64, 0.19], [0, 1.8, 0.08], [0, 2.2, 0.07], [0, 2.42, 0.12], [0, 2.42, 0.5], [0, 2.3, 0.58]], 0.006);
+    cable([[-0.1, 1.64, 0.19], [-0.07, 2.0, 0.05], [-0.065, 2.9, 0.0], [-0.05, 3.0, -0.12], [0, 2.97, -0.3]], 0.006);
+    cable([[0.1, 1.64, 0.19], [0.07, 2.0, 0.05], [0.065, 3.45, 0.0], [0.2, 3.46, 0.0], [0.5, 3.47, 0.0]], 0.005);
+    cable([[0.07, 3.5, 0.0], [0.07, armY, 0.0], [0.4, armY, 0.0], [0.6, armY + 0.05, 0.0]], 0.005);
+    cable([[0.065, 3.6, 0.0], [0.065, armY, 0.0], [-0.4, armY, 0.0], [-0.6, armY + 0.05, 0.0]], 0.005);
+    cyl(scene, 0.012, 1.0, dark, -0.04, 0.65, 0.1, 10);
+    cable([[-0.04, 0.2, 0.1], [0.3, 0.06, 0.8], [0.9, 0.06, 1.0], [1.3, 0.16, 0.9]], 0.007);
+    cable([[-0.04, 0.2, 0.08], [-0.5, 0.06, -0.25], [-1.0, 0.06, -0.75], [-1.45, 0.14, -0.84]], 0.008);
+    cyl(scene, 0.01, 0.55, M(0xb87333, { metalness: 0.8, roughness: 0.35 }), -0.65, 0.15, -0.45, 10);
+    cable([[0, 0.25, -0.04], [-0.3, 0.12, -0.2], [-0.65, 0.38, -0.45]], 0.005);
+
+    const rg = new THREE.Group();
+    rg.position.set(1.3, 0, 0.9);
+    scene.add(rg);
+    box(rg, 0.3, 0.12, 0.3, concrete, 0, 0.1, 0);
+    cyl(rg, 0.035, 0.95, metal, 0, 0.63, 0, 16);
+    cyl(rg, 0.075, 0.012, metal, 0, 1.12, 0, 24);
+    cyl(rg, 0.105, 0.26, M(0xf1f1ee, { roughness: 0.4 }), 0, 1.255, 0, 40);
+    cyl(rg, 0.108, 0.02, grey, 0, 1.14, 0, 40);
+    const rim = add(rg, new THREE.TorusGeometry(0.105, 0.008, 10, 40), metal, 0, 1.385, 0);
+    rim.rotation.x = Math.PI / 2;
+    add(rg, new THREE.CylinderGeometry(0.1, 0.03, 0.05, 36, 1, true), M(0x3b4045, { side: THREE.DoubleSide, metalness: 0.5 }), 0, 1.36, 0);
+    cyl(rg, 0.03, 0.012, M(0x6a7075), 0, 1.337, 0, 16);
+    box(rg, 0.012, 0.06, 0.03, dark, 0.103, 1.24, 0);
+
+    function boxTex() {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 384;
+        const g = c.getContext('2d');
+        g.fillStyle = '#dfe6e8'; g.fillRect(0, 0, 256, 384);
+        g.strokeStyle = '#9fb0b5'; g.lineWidth = 6; g.strokeRect(6, 6, 244, 372);
+        g.fillStyle = '#f1c40f'; g.fillRect(20, 24, 216, 46);
+        g.fillStyle = '#1b2530'; g.textAlign = 'center';
+        g.font = 'bold 30px sans-serif'; g.fillText('KOTAK DAYA', 128, 58);
+        g.font = 'bold 22px sans-serif'; g.fillText('IP65', 128, 112);
+        g.font = '20px sans-serif';
+        g.fillText('Solar regulator', 128, 170);
+        g.fillText('Aki 12V · 28Ah', 128, 204);
+        g.fillStyle = '#c0392b'; g.beginPath(); g.moveTo(128, 250); g.lineTo(168, 316); g.lineTo(88, 316); g.closePath(); g.fill();
+        g.fillStyle = '#fff'; g.font = 'bold 36px sans-serif'; g.fillText('!', 128, 306);
+        const t = new THREE.CanvasTexture(c);
+        t.anisotropy = 4;
+        return t;
+    }
+    const pb = new THREE.Group();
+    pb.position.set(-1.45, 0, -1.0);
+    scene.add(pb);
+    box(pb, 0.7, 0.1, 0.5, concrete, 0, 0.09, 0);
+    box(pb, 0.52, 0.7, 0.32, M(0xd5dde0, { roughness: 0.5 }), 0, 0.5, 0);
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 0.66), new THREE.MeshStandardMaterial({ map: boxTex(), roughness: 0.5, side: THREE.DoubleSide }));
+    door.position.set(0, 0.5, 0.162);
+    pb.add(door);
+    box(pb, 0.03, 0.12, 0.02, dark, 0.2, 0.5, 0.18);
+    const ledGlowMat = new THREE.MeshBasicMaterial({ color: 0x2cff83, transparent: true, opacity: 0.12, depthWrite: false });
+    const ledGlow = new THREE.Mesh(new THREE.CircleGeometry(0.04, 24), ledGlowMat);
+    ledGlow.position.set(0.17, 0.24, 0.165);
+    pb.add(ledGlow);
+    const ledMat = new THREE.MeshStandardMaterial({ color: 0x33ff82, emissive: 0x19e76c, emissiveIntensity: 0.25, roughness: 0.25 });
+    const statusLed = new THREE.Mesh(new THREE.SphereGeometry(0.018, 14, 10), ledMat);
+    statusLed.position.set(0.17, 0.24, 0.184);
+    pb.add(statusLed);
+    const proof = box(pb, 0.58, 0.012, 0.38, M(0xc5cdd0), 0, 0.86, 0.02);
+    proof.rotation.x = 0.06;
+    [0.28, 0.4, 0.52].forEach(y => box(pb, 0.012, 0.025, 0.18, dark, 0.262, y + 0.1, 0));
+    cyl(pb, 0.02, 0.06, dark, 0.15, 0.12, 0.1, 12);
+
+    function meshTex() {
+        const c = document.createElement('canvas');
+        c.width = 64; c.height = 64;
+        const g = c.getContext('2d');
+        g.strokeStyle = '#cfe0e4'; g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(0, 0); g.lineTo(64, 64); g.moveTo(0, 64); g.lineTo(64, 0);
+        g.moveTo(-32, 32); g.lineTo(32, 96); g.moveTo(32, -32); g.lineTo(96, 32);
+        g.moveTo(-32, 32); g.lineTo(32, -32); g.moveTo(32, 96); g.lineTo(96, 32);
+        g.stroke();
+        const t = new THREE.CanvasTexture(c);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.anisotropy = 4;
+        return t;
+    }
+    const mt = meshTex();
+    function fenceSide(x1, z1, x2, z2) {
+        const len = Math.hypot(x2 - x1, z2 - z1);
+        const mx = (x1 + x2) / 2, mz = (z1 + z2) / 2, ang = Math.atan2(z2 - z1, x2 - x1);
+        const tex = mt.clone();
+        tex.needsUpdate = true;
+        tex.repeat.set(len / 0.35, 1.2 / 0.35);
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.2), new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide }));
+        m.position.set(mx, 0.66, mz);
+        m.rotation.y = -ang;
+        scene.add(m);
+        [0.06, 1.26].forEach(y => {
+            const r = cyl(scene, 0.012, len, metal, mx, y, mz, 8);
+            r.rotation.z = Math.PI / 2;
+            r.rotation.y = -ang;
+        });
+    }
+    const H = 2.5;
+    [-H, -H / 2, 0, H / 2, H].forEach(p => {
+        cyl(scene, 0.025, 1.35, metal, p, 0.675, -H, 12);
+        if (Math.abs(p) > 0.7) cyl(scene, 0.025, 1.35, metal, p, 0.675, H, 12);
+        cyl(scene, 0.025, 1.35, metal, -H, 0.675, p, 12);
+        cyl(scene, 0.025, 1.35, metal, H, 0.675, p, 12);
+    });
+    [-0.6, 0.6].forEach(p => cyl(scene, 0.04, 1.4, metal, p, 0.7, H, 14));
+    fenceSide(-H, -H, H, -H);
+    fenceSide(-H, -H, -H, H);
+    fenceSide(H, -H, H, H);
+    fenceSide(-H, H, -0.6, H);
+    fenceSide(0.6, H, H, H);
+    const gatePivot = new THREE.Group();
+    gatePivot.position.set(-0.6, 0, H);
+    scene.add(gatePivot);
+    box(gatePivot, 1.17, 0.035, 0.035, metal, 0.585, 0.12, 0);
+    box(gatePivot, 1.17, 0.035, 0.035, metal, 0.585, 1.2, 0);
+    for (let x = 0.08; x <= 1.1; x += 0.14) cyl(gatePivot, 0.012, 1.1, metal, x, 0.66, 0, 10);
+    cyl(gatePivot, 0.025, 1.24, metal, 1.16, 0.66, 0, 12);
+    box(gatePivot, 0.1, 0.12, 0.06, dark, 1.12, 0.66, 0.02);
+
+    // Teknisi low-poly untuk animasi inspeksi setelah tur kamera.
+    const technician = new THREE.Group();
+    technician.visible = false;
+    scene.add(technician);
+    const workPants = M(0x26384a, { roughness: 0.9 });
+    const workShirt = M(0x1f4160, { roughness: 0.85 });
+    const safetyVest = M(0xffa51f, { roughness: 0.75 });
+    const hardHat = M(0xffd52a, { roughness: 0.55 });
+    const bootMat = M(0x202528, { roughness: 0.8 });
+    const techTorso = new THREE.Group();
+    techTorso.position.y = 1.1;
+    technician.add(techTorso);
+    box(techTorso, 0.39, 0.53, 0.24, workShirt, 0, 0.18, 0);
+    box(techTorso, 0.4, 0.38, 0.255, safetyVest, 0, 0.2, -0.012);
+    box(techTorso, 0.035, 0.34, 0.012, M(0xf5f0d0), 0, 0.2, -0.145);
+    box(techTorso, 0.27, 0.22, 0.2, workPants, 0, -0.19, 0);
+    box(techTorso, 0.22, 0.3, 0.14, workPants, 0, 0.23, 0.17);
+    function makeTechLeg(side) {
+        const leg = new THREE.Group();
+        leg.position.set(side * 0.115, 0.78, 0);
+        technician.add(leg);
+        box(leg, 0.15, 0.68, 0.17, workPants, 0, -0.34, 0);
+        box(leg, 0.17, 0.11, 0.28, bootMat, 0, -0.71, -0.045);
+        return leg;
+    }
+    const techLegs = [makeTechLeg(-1), makeTechLeg(1)];
+    function makeTechArm(side) {
+        const arm = new THREE.Group();
+        arm.position.set(side * 0.245, 1.43, 0);
+        technician.add(arm);
+        box(arm, 0.13, 0.34, 0.14, safetyVest, 0, -0.16, 0);
+        const forearm = new THREE.Group();
+        forearm.position.y = -0.32;
+        arm.add(forearm);
+        box(forearm, 0.11, 0.31, 0.12, workShirt, 0, -0.15, 0);
+        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.065, 10, 8), bootMat);
+        hand.position.set(0, -0.32, -0.01);
+        forearm.add(hand);
+        arm.userData.forearm = forearm;
+        return arm;
+    }
+    const techArms = [makeTechArm(-1), makeTechArm(1)];
+    const techHead = new THREE.Group();
+    techHead.position.set(0, 1.62, 0);
+    technician.add(techHead);
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.125, 14, 10), M(0xc98f66, { roughness: 0.85 }));
+    techHead.add(face);
+    const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.035, 20), hardHat);
+    brim.position.y = 0.12; techHead.add(brim);
+    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.145, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), hardHat);
+    helmet.position.y = 0.13; techHead.add(helmet);
+
+    function signTex() {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 256;
+        const g = c.getContext('2d');
+        g.fillStyle = '#0d5c63'; g.fillRect(0, 0, 512, 256);
+        g.strokeStyle = '#fff'; g.lineWidth = 8; g.strokeRect(10, 10, 492, 236);
+        g.fillStyle = '#fff'; g.textAlign = 'center';
+        g.font = 'bold 60px sans-serif'; g.fillText('AWS MIT', 256, 95);
+        g.font = 'bold 26px sans-serif'; g.fillText('M. Taufik, Idris, Toni Satria', 256, 150);
+        g.font = '24px sans-serif'; g.fillText('Dilarang masuk tanpa izin', 256, 205);
+        return new THREE.CanvasTexture(c);
+    }
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.3), new THREE.MeshStandardMaterial({ map: signTex(), side: THREE.DoubleSide }));
+    sign.position.set(-1.6, 0.85, H + 0.02);
+    sign.castShadow = true;
+    scene.add(sign);
+    [0.8, 1.3, 1.8].forEach(z => box(scene, 0.6, 0.03, 0.4, concrete, 0, 0.055, z + 0.35));
+
+    const labelData = [
+        ['Anemometer + vane', 'Kecepatan & arah angin', [-0.6, 4.4, 0], 'l'],
+        ['Pyranometer', 'Radiasi matahari', [0.5, 3.56, 0], 'r'],
+        ['Panel surya', 'Pengisian mandiri', [0, 3.0, -0.5], 'l'],
+        ['Suhu & kelembapan', 'Pelindung radiasi (shield)', [0, 2.22, 0.58], 'l'],
+        ['Penakar hujan', 'Tipping bucket', [1.3, 1.3, 0.9], 'r'],
+        ['Kotak daya IP-rated', 'Solar regulator + baterai 28Ah', [-1.45, 0.55, -0.84], 'l'],
+        ['Pagar taman alat', 'Area terlindungi', [2.5, 0.95, 1.2], 'r']
+    ];
+    const labels = labelData.map(l => {
+        const d = document.createElement('div');
+        d.className = 'aws-chip aws-chip-' + l[3];
+        d.innerHTML = '<span class="aws-chip-dot"></span><span class="aws-chip-body"><b>' + l[0].replace(/&/g, '&amp;') + '</b><small>' + l[1].replace(/&/g, '&amp;') + '</small></span>';
+        labelsEl.appendChild(d);
+        return { el: d, pos: V(l[2][0], l[2][1], l[2][2]) };
+    });
+
+    const focusMap = {
+        wind: { pos: V(0, 4.42, 0), tgt: V(0, 4.2, 0), cam: V(2.4, 5.0, 2.8) },
+        air: { pos: V(0, 2.22, 0.58), tgt: V(0, 2.2, 0.4), cam: V(1.5, 2.6, 2.3) },
+        rain: { pos: V(1.3, 1.33, 0.9), tgt: V(1.3, 1.2, 0.9), cam: V(2.7, 1.9, 2.7) },
+        solar: { pos: V(0.5, 3.56, 0), tgt: V(0.3, 3.4, -0.1), cam: V(2.0, 3.9, 2.0) },
+        power: { pos: V(-1.45, 0.55, -0.84), tgt: V(-1.45, 0.5, -1.0), cam: V(-0.9, 1.3, 1.2) }
+    };
+
+    let focus = null, anim = null, showLabels = true;
+
+    let panX = 0, panY = 0;
+    function flyTo(p, t, speed) { anim = { p: p.clone().add(V(panX, panY, 0)), t: t.clone().add(V(panX, panY, 0)), speed: speed || 3.5 }; }
+    controls.addEventListener('start', () => {
+        anim = null;
+        if (typeof cameraTourActive !== 'undefined' && cameraTourActive) stopCameraTour(false);
+    });
+
+    function lineTo(x, y) { lineEl.setAttribute('x2', x); lineEl.setAttribute('y2', y); }
+    function placeOverlay() {
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        if (showLabels) {
+            labels.forEach(l => {
+                const p = l.pos.clone().project(camera);
+                if (p.z > 1) { l.el.style.display = 'none'; return; }
+                l.el.style.display = 'block';
+                l.el.style.transform = 'translate(' + ((p.x * 0.5 + 0.5) * w).toFixed(1) + 'px,' + ((-p.y * 0.5 + 0.5) * h).toFixed(1) + 'px)';
+            });
+        }
+        if (!focus) return;
+        const p = focus.pos.clone().project(camera);
+        if (p.z > 1) { marker.style.display = 'none'; card.style.display = 'none'; lineEl.style.display = 'none'; return; }
+        const x = (p.x * 0.5 + 0.5) * w, y = (-p.y * 0.5 + 0.5) * h;
+        marker.style.display = 'block'; card.style.display = 'block'; lineEl.style.display = 'block';
+        marker.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+        const cw = card.offsetWidth, ch = card.offsetHeight;
+        let cx = x + 34, cy = y - ch - 30;
+        if (cx + cw > w - 8) cx = x - 34 - cw;
+        if (cx < 8) cx = 8;
+        if (cy < 8) cy = y + 30;
+        if (cy + ch > h - 8) cy = h - 8 - ch;
+        card.style.transform = 'translate(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px)';
+        lineEl.setAttribute('x1', x);
+        lineEl.setAttribute('y1', y);
+        lineTo(Math.min(Math.max(x, cx), cx + cw), Math.min(Math.max(y, cy), cy + ch));
+    }
+
+    function resize() {
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+    }
+    resize();
+    new ResizeObserver(resize).observe(wrap);
+
+    let visible = true;
+    new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(wrap);
+
+    let vAng = Math.PI / 2, rotSpeed = 0, t0 = performance.now();
+    const sceneStart = t0;
+    let gateTarget = 0;
+    const gateButton = document.getElementById('awsBtnGate');
+    function setGate(open) {
+        gateTarget = open ? -Math.PI * 0.58 : 0;
+        gateButton.setAttribute('aria-pressed', String(open));
+        gateButton.innerHTML = open ? '<i class="fas fa-door-open"></i>Tutup gerbang' : '<i class="fas fa-door-closed"></i>Buka gerbang';
+    }
+    function toggleGate() { setGate(gateTarget === 0); }
+    const techState = { phase: 'hidden', timer: 0, path: [], pathIndex: 0, stopIndex: 0, walkCycle: 0, lastSecond: -1, resolve: null, notify: null, cancelRequested: false };
+    const techPathIn = [
+        { p: V(0,0,1.8) },
+        { p: V(0.95,0,1.15), check: 'Penakar hujan · TB4 Hygro' },
+        { p: V(0.72,0,0.55), check: 'Sensor suhu & kelembapan · TRH' },
+        { p: V(0.75,0,-0.25), check: 'Sensor radiasi matahari · SR' },
+        { p: V(0.8,0,1.55) }, { p: V(-1.15,0,1.55) },
+        { p: V(-1.1,0,-0.65), check: 'Kotak daya dan panel surya' },
+        { p: V(-1.15,0,1.55) },
+        { p: V(-0.9,0,0.55), check: 'Anemometer dan penunjuk arah angin' }
+    ];
+    function reportTech(message) { if (techState.notify) techState.notify(message); }
+    function finishTechnician() {
+        technician.visible = false;
+        technician.position.y = 0;
+        techState.phase = 'hidden';
+        setGate(false);
+        reportTech('Pemeriksaan selesai. Teknisi sudah kembali.');
+        const done = techState.resolve;
+        techState.resolve = null; techState.notify = null;
+        if (done) done();
+    }
+    function runTechnicianInspection(notify) {
+        if (techState.phase !== 'hidden') return Promise.resolve();
+        return new Promise(resolve => {
+            techState.phase = 'entryWait'; techState.timer = 0.8; techState.pathIndex = 0;
+            techState.walkCycle = 0; techState.lastSecond = -1; techState.stopIndex = 0; techState.resolve = resolve;
+            techState.notify = notify; techState.cancelRequested = false;
+            technician.position.set(0, 0, 4.35); technician.rotation.y = Math.PI;
+            technician.visible = true;
+            setGate(true);
+            reportTech('Teknisi menuju taman alat…');
+        });
+    }
+    function cancelTechnicianInspection() {
+        if (techState.phase === 'hidden') return;
+        techState.cancelRequested = true;
+        if (techState.phase === 'entryWait') { finishTechnician(); return; }
+        if (techState.phase === 'walkOut' || techState.phase === 'exitWait') return;
+        techState.phase = 'exitWait'; techState.timer = 0.65;
+        setGate(true);
+        reportTech('Teknisi menghentikan pemeriksaan dan kembali…');
+    }
+    function walkTechnician(dt) {
+        const target = techState.path[techState.pathIndex];
+        if (!target) return false;
+        techArms.forEach(a => { a.rotation.z = 0; a.userData.forearm.rotation.x = -0.2; });
+        techHead.rotation.set(0, 0, 0); techTorso.rotation.set(0, 0, 0);
+        const dx = target.p.x - technician.position.x, dz = target.p.z - technician.position.z;
+        const distance = Math.hypot(dx, dz), step = Math.min(distance, 0.82 * dt);
+        if (distance > 0.001) {
+            const angle = Math.atan2(-dx, -dz);
+            let turn = ((angle - technician.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+            technician.rotation.y += turn * Math.min(1, dt * 5);
+            technician.position.x += dx / distance * step;
+            technician.position.z += dz / distance * step;
+        }
+        techState.walkCycle += dt * 8.5;
+        technician.position.y = Math.abs(Math.sin(techState.walkCycle * 2)) * 0.025;
+        const swing = Math.sin(techState.walkCycle) * 0.52;
+        techLegs[0].rotation.x = swing; techLegs[1].rotation.x = -swing;
+        techArms[0].rotation.x = -swing * 0.75; techArms[1].rotation.x = swing * 0.75;
+        techArms.forEach(a => { a.userData.forearm.rotation.x = -0.2; });
+        return distance <= step + 0.015;
+    }
+    function animateTechnician(dt, t) {
+        if (techState.phase === 'hidden') return;
+        if (techState.phase === 'entryWait') {
+            techState.timer -= dt;
+            if (techState.timer <= 0) { techState.phase = 'walkIn'; techState.path = techPathIn; techState.pathIndex = 0; }
+        } else if (techState.phase === 'exitWait') {
+            techState.timer -= dt;
+            if (techState.timer <= 0) {
+                techState.phase = 'walkOut'; techState.path = [{p:V(0,0,1.8)},{p:V(0,0,4.35)}]; techState.pathIndex = 0;
+                reportTech('Teknisi meninggalkan taman alat…');
+            }
+        } else if (techState.phase === 'walkIn' || techState.phase === 'walkOut') {
+            if (walkTechnician(dt)) {
+                if (techState.phase === 'walkOut') {
+                    techState.pathIndex++;
+                    if (techState.pathIndex >= techState.path.length) finishTechnician();
+                } else {
+                    const stop = techState.path[techState.pathIndex];
+                    if (techState.pathIndex === 0) setGate(false);
+                    techState.pathIndex++;
+                    if (stop && stop.check) {
+                        techState.phase = 'inspect'; techState.timer = 12; techState.lastSecond = -1;
+                        reportTech(`Memeriksa ${stop.check} · 00:12`);
+                    }
+                }
+            }
+        } else if (techState.phase === 'inspect') {
+            techState.timer = Math.max(0, techState.timer - dt);
+            const seconds = Math.ceil(techState.timer);
+            if (seconds !== techState.lastSecond) {
+                const stop = techPathIn[techState.pathIndex - 1];
+                reportTech(`Memeriksa ${stop.check} · 00:${String(seconds).padStart(2,'0')}`);
+                techState.lastSecond = seconds;
+            }
+            techLegs.forEach(l => { l.rotation.x = 0; });
+            techArms[0].rotation.x = -0.18;
+            techArms[0].rotation.z = -0.38 + Math.sin(t * 0.0018) * 0.08;
+            techArms[1].rotation.x = 0.55 + Math.sin(t * 0.0024) * 0.12;
+            techArms[1].rotation.z = 0.18;
+            techArms[1].userData.forearm.rotation.x = -0.25 + Math.sin(t * 0.003) * 0.12;
+            techHead.rotation.x = 0.12 + Math.sin(t * 0.0015) * 0.05;
+            techTorso.rotation.x = Math.sin(t * 0.0012) * 0.025;
+            if (techState.timer <= 0) {
+                techState.stopIndex++;
+                if (techState.stopIndex >= 5) { techState.phase = 'exitWait'; techState.timer = 0.8; setGate(true); reportTech('Pemeriksaan selesai, teknisi kembali…'); }
+                else { techState.phase = 'walkIn'; techArms.forEach(a => { a.rotation.set(0,0,0); }); techHead.rotation.set(0,0,0); techTorso.rotation.set(0,0,0); }
+            }
+        }
+    }
+    gateButton.addEventListener('click', toggleGate);
+    const gateRay = new THREE.Raycaster(), gatePointer = new THREE.Vector2();
+    let pointerDown = null;
+    canvas.addEventListener('pointerdown', e => { pointerDown = { x: e.clientX, y: e.clientY }; });
+    canvas.addEventListener('pointerup', e => {
+        if (!pointerDown || Math.hypot(e.clientX - pointerDown.x, e.clientY - pointerDown.y) > 6) { pointerDown = null; return; }
+        pointerDown = null;
+        const rect = canvas.getBoundingClientRect();
+        gatePointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+        gateRay.setFromCamera(gatePointer, camera);
+        if (gateRay.intersectObject(gatePivot, true).length) toggleGate();
+    });
+    function loop(t) {
+        requestAnimationFrame(loop);
+        const dt = Math.min((t - t0) / 1000, 0.05);
+        t0 = t;
+        if (!visible) return;
+        const cur = (typeof current !== 'undefined') ? current : { wind: 4, windDir: 45 };
+        gatePivot.rotation.y += (gateTarget - gatePivot.rotation.y) * Math.min(dt * 5, 1);
+        if (Math.abs(gateTarget - gatePivot.rotation.y) < 0.004) gatePivot.rotation.y = gateTarget;
+        const ledOn = Math.sin(t * 0.003) > 0;
+        ledMat.emissiveIntensity = ledOn ? 1.8 : 0.12;
+        ledGlowMat.opacity = ledOn ? 0.28 : 0.035;
+        animateTechnician(dt, t);
+        if (!reducedMotion) {
+            const elapsed = (t - sceneStart) / 1000;
+            birds.forEach((b, i) => {
+                const flight = (elapsed + i * 8) % 36;
+                b.visible = flight < 10;
+                if (!b.visible) return;
+                b.position.set(-9 + flight * 1.8, 6.25 + Math.sin(flight * 0.72 + i) * 0.32, -5.4 - i * 0.15);
+                b.scale.setScalar(0.75 + i * 0.12);
+                b.userData.wings[0].rotation.z = Math.sin(t * 0.012 + i) * 0.48;
+                b.userData.wings[1].rotation.z = -Math.sin(t * 0.012 + i) * 0.48;
+            });
+        }
+        const targetSpeed = (cur.wind / 3.6) * 1.4;
+        rotSpeed += (targetSpeed - rotSpeed) * Math.min(dt * 2, 1);
+        rotor.rotation.y -= rotSpeed * dt;
+        const target = Math.PI / 2 - cur.windDir * Math.PI / 180 + Math.sin(t / 700) * 0.03;
+        const diff = Math.atan2(Math.sin(target - vAng), Math.cos(target - vAng));
+        vAng += diff * Math.min(dt * 3, 1);
+        vane.rotation.y = vAng;
+        if (anim) {
+            const k = Math.min(dt * anim.speed, 1);
+            camera.position.lerp(anim.p, k);
+            controls.target.lerp(anim.t, k);
+            if (camera.position.distanceTo(anim.p) < 0.02 && controls.target.distanceTo(anim.t) < 0.02) anim = null;
+        }
+        controls.update();
+        renderer.render(scene, camera);
+        placeOverlay();
+    }
+    requestAnimationFrame(loop);
+
+    window.AWS3D = {
+        pan: function (x, y) {
+            const dx = x - panX, dy = y - panY;
+            panX = x; panY = y; anim = null;
+            camera.position.add(V(dx, dy, 0));
+            controls.target.add(V(dx, dy, 0));
+            controls.update();
+        },
+        focus: function (key, title, value, info, speed) {
+            const f = focusMap[key];
+            if (!f) return;
+            focus = f;
+            cardTitle.textContent = title;
+            cardValue.textContent = value;
+            cardInfo.textContent = info || '';
+            flyTo(f.cam, f.tgt, speed);
+        },
+        setReading: function (value) { cardValue.textContent = value; },
+        reset: function (speed) {
+            focus = null;
+            marker.style.display = 'none'; card.style.display = 'none'; lineEl.style.display = 'none';
+            flyTo(home.p, home.t, speed);
+        },
+        toggleLabels: function () {
+            showLabels = !showLabels;
+            labelsEl.style.display = showLabels ? 'block' : 'none';
+            return showLabels;
+        },
+        toggleRotate: function () {
+            controls.autoRotate = !controls.autoRotate;
+            return controls.autoRotate;
+        },
+        runTechnician: runTechnicianInspection,
+        cancelTechnician: cancelTechnicianInspection
+    };
+})();
+
+    </script>
+    <script>
+        (function () {
+            const bl = document.getElementById('awsBtnLabels'), br = document.getElementById('awsBtnRotate'), bs = document.getElementById('awsBtnReset');
+            const px = document.getElementById('scenePanX'), py = document.getElementById('scenePanY');
+            function moveView() {
+                if (!window.AWS3D) return;
+                window.AWS3D.pan((Number(px.value) - 50) * 0.08, (50 - Number(py.value)) * 0.06);
+            }
+            px.addEventListener('input', moveView);
+            py.addEventListener('input', moveView);
+            bl.addEventListener('click', () => { if (!window.AWS3D) return; const on = window.AWS3D.toggleLabels(); bl.classList.toggle('active', on); bl.setAttribute('aria-pressed', String(on)); });
+            br.addEventListener('click', () => { if (!window.AWS3D) return; const on = window.AWS3D.toggleRotate(); br.classList.toggle('active', on); br.setAttribute('aria-pressed', String(on)); });
+            bs.addEventListener('click', () => {
+                if (!window.AWS3D) return;
+                if (cameraTourActive) stopCameraTour(false);
+                window.AWS3D.pan(0, 0);
+                document.getElementById('scenePanX').value = '50';
+                document.getElementById('scenePanY').value = '50';
+                window.AWS3D.reset();
+                activeSceneSensor = null;
+                document.querySelectorAll('[data-scene-sensor]').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+            });
+        })();
+    </script>
+
+</body>
+</html>
