@@ -66,7 +66,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .cp-card{fill:var(--text);font:700 17px var(--sans)}
 .cp-sec{fill:var(--text-2);font:600 8px var(--sans)}.cp-sec.b{font-size:10px;font-weight:700}
 .cp-star{fill:var(--accent-soft);stroke:var(--text-3);stroke-width:.8}
-#needle{transform-origin:170px 170px;transition:transform .9s cubic-bezier(.3,.8,.3,1)}
+#needle{transform-origin:170px 170px;transition:transform 1.6s cubic-bezier(.3,.8,.3,1)}
 .cp-hub{fill:var(--surface);stroke:var(--c-wind);stroke-width:2}
 .cp-dir{fill:var(--text);font:700 15px var(--sans)}.cp-dd{fill:var(--text-2);font:500 10px var(--mono)}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -223,6 +223,45 @@ tr.new td{animation:row 2s}
 .group-title{letter-spacing:.04em;text-transform:uppercase;font-size:11px}
 @media(prefers-reduced-motion:reduce){.topbar::before,.logo,.logo::after,.card,.bar i::after,.spark path:last-child{animation:none!important}.card{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Asisten suara ===== */
+.va-mic:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.va-panel{position:fixed;right:18px;bottom:18px;z-index:60;width:min(370px,calc(100vw - 24px));max-height:calc(100vh - 40px);overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px;font-family:var(--sans)}
+.va-panel[hidden]{display:none}
+.va-head{display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.va-head i{color:var(--accent);margin-right:6px}
+.va-head button{background:none;border:0;color:var(--text-2);cursor:pointer;font-size:16px;padding:4px}
+.va-status{font-size:12px;color:var(--text-2);min-height:16px}
+.va-log{display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.45}
+.va-q{align-self:flex-end;max-width:90%;background:var(--accent-soft);color:var(--text);border-radius:12px 12px 2px 12px;padding:7px 10px}
+.va-a{align-self:flex-start;max-width:96%;background:var(--surface-2);border:1px solid var(--border);border-radius:12px 12px 12px 2px;padding:8px 10px}
+.va-q:empty,.va-a:empty{display:none}
+.va-chips{display:flex;flex-wrap:wrap;gap:6px}
+.va-chips button{font:500 11.5px var(--sans);color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 10px;cursor:pointer}
+.va-chips button:hover{color:var(--text);border-color:var(--accent)}
+.va-row{display:flex;gap:8px;align-items:center}
+.va-row input{flex:1;min-width:0;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:9px 10px;font:13px var(--sans)}
+.va-row input:focus{outline:2px solid var(--accent);outline-offset:0}
+.va-row .va-send{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer}
+.va-mic{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;border-radius:12px;border:0;cursor:pointer;font:700 15px var(--sans);color:#04222b;background:linear-gradient(135deg,var(--accent),var(--c-wind))}
+.va-mic i{font-size:20px}
+.va-mic[disabled]{opacity:.4;cursor:not-allowed}
+.va-mic.listening{background:var(--bad);color:#fff;animation:vaPulse 1.2s infinite}
+.va-mic.speaking{background:var(--c-solar);color:#2a1a00}
+@keyframes vaPulse{0%{box-shadow:0 0 0 0 rgba(248,113,113,.55)}100%{box-shadow:0 0 0 12px rgba(248,113,113,0)}}
+@media (prefers-reduced-motion:reduce){.va-mic.listening{animation:none}}
+
+/* ===== Gesture tangan ===== */
+.gs-cam{position:fixed;left:14px;bottom:14px;z-index:60;width:200px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;font-family:var(--sans)}
+.gs-cam[hidden],.gs-cursor[hidden]{display:none}
+.gs-view{position:relative;aspect-ratio:4/3;background:#000}
+.gs-view video,.gs-view canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.gs-status{font-size:11.5px;line-height:1.35;color:var(--text-2);padding:7px 30px 7px 9px;min-height:34px}
+.gs-cam .gs-close{position:absolute;right:4px;bottom:5px;background:none;border:0;color:var(--text-2);cursor:pointer;font-size:14px;padding:4px 6px}
+.gs-cursor{position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid var(--accent);background:rgba(34,211,238,.18);box-shadow:0 0 14px rgba(34,211,238,.6);pointer-events:none;z-index:95;transition:width .08s,height .08s,margin .08s,background .08s}
+.gs-cursor.pinch{width:20px;height:20px;margin:-10px 0 0 -10px;background:var(--accent);border-color:#fff}
+.scene-foot button.gs-hover{outline:3px solid var(--accent);outline-offset:2px;box-shadow:0 0 16px rgba(34,211,238,.65);transform:scale(1.06)}
+@media (max-width:640px){.gs-cam{width:140px}}
 </style>
 </head>
 <body>
@@ -294,11 +333,14 @@ tr.new td{animation:row 2s}
                 <button type="button" data-scene-sensor="rain"><i class="fas fa-cloud-rain"></i>Hujan</button>
                 <button type="button" data-scene-sensor="solar"><i class="fas fa-sun"></i>Radiasi</button>
                 <button type="button" data-scene-sensor="power"><i class="fas fa-battery-three-quarters"></i>Catu daya</button>
+                <button type="button" data-scene-sensor="cctv"><i class="fas fa-video"></i>CCTV</button>
                 <button type="button" id="awsBtnLabels" class="active" aria-pressed="true"><i class="fas fa-tag"></i>Label</button>
                 <button type="button" id="awsBtnRotate" aria-pressed="false"><i class="fas fa-rotate"></i>Putar otomatis</button>
                 <button type="button" id="awsBtnTour" aria-pressed="false"><i class="fas fa-route"></i>Tur + inspeksi</button>
                 <button type="button" id="awsBtnReset"><i class="fas fa-expand"></i>Tampilan awal</button>
                 <button type="button" id="awsBtnGate" aria-pressed="false"><i class="fas fa-door-closed"></i>Buka gerbang</button>
+                <button type="button" id="awsBtnGesture" aria-pressed="false" title="Kendalikan tombol dengan gesture tangan lewat kamera"><i class="fas fa-hand"></i>Gesture tangan</button>
+                <button type="button" id="awsBtnVoice" aria-pressed="false" aria-expanded="false" title="Tanya nilai sensor dengan suara lewat mikrofon"><i class="fas fa-headset"></i>Asisten suara</button>
             </div>
         </section>
 
@@ -312,7 +354,7 @@ tr.new td{animation:row 2s}
     <div class="chart" id="ch-th"></div>
   </section>
   <section class="chart-card">
-    <div class="chart-head"><div class="chart-title"><i class="fas fa-wind"></i> Kecepatan angin (km/h)</div></div>
+    <div class="chart-head"><div class="chart-title"><i class="fas fa-wind"></i> Kecepatan angin (m/s)</div></div>
     <div class="chart" id="ch-wind"></div>
   </section>
   <section class="chart-card">
@@ -328,7 +370,7 @@ tr.new td{animation:row 2s}
   </div>
   <div class="tscroll">
     <table>
-      <thead><tr><th>Waktu (UTC)</th><th>Suhu (°C)</th><th>Kelembapan (%)</th><th>Angin (km/h)</th><th>Arah</th><th>Tekanan (hPa)</th><th>Hujan (mm)</th><th>Radiasi (W/m²)</th><th>Status</th></tr></thead>
+      <thead><tr><th>Waktu (UTC)</th><th>Suhu (°C)</th><th>Kelembapan (%)</th><th>Angin (m/s)</th><th>Arah</th><th>Tekanan (hPa)</th><th>Hujan (mm)</th><th>Radiasi (W/m²)</th><th>Status</th></tr></thead>
       <tbody id="dataTable"></tbody>
     </table>
   </div>
@@ -336,6 +378,25 @@ tr.new td{animation:row 2s}
 <div class="footer">&copy; <span id="yr">2024</span> AWS MIT (M. Taufik, Idris dan Toni Satria) | Sistem Monitoring AWS | Pembaruan data setiap 10 menit</div>
 </div>
 
+<section id="vaPanel" class="va-panel" hidden aria-label="Asisten suara AWS">
+  <div class="va-head"><b><i class="fas fa-robot"></i>Asisten suara AWS</b><button type="button" id="vaClose" aria-label="Tutup asisten"><i class="fas fa-xmark"></i></button></div>
+  <div class="va-status" id="vaStatus" aria-live="polite"></div>
+  <div class="va-log"><div class="va-q" id="vaQ"></div><div class="va-a" id="vaA"></div></div>
+  <button type="button" id="vaMic" class="va-mic"><i class="fas fa-microphone"></i><span>Tekan untuk bicara</span></button>
+  <div class="va-chips" id="vaChips">
+    <button type="button">Kondisi saat ini</button><button type="button">Berapa suhu sekarang?</button><button type="button">Bagaimana kecepatan dan arah angin?</button><button type="button">Apakah sedang hujan?</button><button type="button">Berapa radiasi matahari?</button><button type="button">Kapan data diperbarui?</button><button type="button">Apa fungsi CCTV?</button>
+  </div>
+  <div class="va-row">
+    <input id="vaInput" type="text" placeholder="Atau ketik pertanyaan…" autocomplete="off" aria-label="Ketik pertanyaan">
+    <button type="button" id="vaSend" class="va-send" aria-label="Kirim"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</section>
+<div id="gsCam" class="gs-cam" hidden>
+  <div class="gs-view"><video id="gsVideo" playsinline muted></video><canvas id="gsCanvas"></canvas></div>
+  <div class="gs-status" id="gsStatus" aria-live="polite"></div>
+  <button type="button" class="gs-close" id="gsClose" aria-label="Matikan gesture tangan"><i class="fas fa-xmark"></i></button>
+</div>
+<div id="gsCursor" class="gs-cursor" hidden></div>
 <script>
 const UPDATE_INTERVAL_MS=10*60*1000,N=24,TABLE_ROWS=12;
 let current={temp:28.5,humidity:78,wind:12.4,windDir:245,pressure:1012.8,rain:3.2,solar:682};
@@ -350,9 +411,35 @@ const f1=n=>n.toFixed(1);
 function drift(v,m,min,max){let x=v+(Math.random()*2-1)*m;if(x<min)x=min+Math.random()*m*.5;if(x>max)x=max-Math.random()*m*.5;return x}
 const DIRS=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 function degreesToCompass(deg){return DIRS[Math.round(deg/22.5)%16]}
-const BF_MAX=[1,5,11,19,28,38,49,61,74,88,102,117];
+const BF_MAX=[.3,1.6,3.4,5.5,8,10.8,13.9,17.2,20.8,24.5,28.5,32.7]; // batas Beaufort dalam m/s
 const BF_TXT=['Tenang','Udara ringan','Angin lemah','Angin lembut','Angin sedang','Angin agak kuat','Angin kuat','Angin kencang','Angin sangat kencang','Badai','Badai kuat','Badai dahsyat','Topan'];
 function beaufort(k){const i=BF_MAX.findIndex(m=>k<m);return i<0?12:i}
+
+/* ===== Simulasi cuaca: angin, hujan, radiasi (stasiun WIB = UTC+7) ===== */
+const WX={sky:.7,wet:false,speed:2,dir:245};
+function solarClear(d){ // radiasi langit cerah (W/m²), 0 saat malam
+  const l=(d.getUTCHours()+d.getUTCMinutes()/60+7)%24,t=(l-6)/12;
+  return t<=0||t>=1?0:1000*Math.pow(Math.sin(Math.PI*t),1.3);
+}
+function stepWeather(date){
+  const clear=solarClear(date),df=clear/1000;
+  // tutupan awan (sky=1 cerah, kecil = mendung) dan hujan berkelanjutan
+  WX.sky+=(.65-WX.sky)*.1+(Math.random()*2-1)*.18;
+  WX.sky=Math.max(.15,Math.min(1,WX.sky));
+  if(WX.wet){if(Math.random()<.4)WX.wet=false}
+  else if(Math.random()<(WX.sky<.5?.15:.02))WX.wet=true;
+  if(WX.wet)WX.sky=Math.min(WX.sky,.25+Math.random()*.1);
+  const rain=WX.wet?[.2,.2,.2,.4,.4,.6,.8][Math.floor(Math.random()*7)]:0; // kelipatan 0,2 mm (tipping bucket)
+  // kecepatan angin (m/s): tenang malam hari, lebih kencang siang, berubah pelan tiap 10 menit
+  const target=.8+3*df+(WX.wet?.6:0);
+  let v=WX.speed+(target-WX.speed)*.25+(Math.random()*2-1)*.9;
+  if(v<0)v=Math.random()*.3;
+  WX.speed=Math.min(7.5,v);
+  // arah angin: angin laut siang (utara-timur laut), angin darat malam (selatan); makin tak menentu saat angin lemah
+  const tdir=df>.3?20:190,diff=((tdir-WX.dir+540)%360)-180,jit=WX.speed<1?40:18;
+  WX.dir=(Math.round(WX.dir+diff*.12+(Math.random()*2-1)*jit)+360)%360;
+  return{wind:roundTo(WX.speed),windDir:WX.dir,rain,solar:clear?Math.max(0,Math.round(clear*WX.sky*(1+(Math.random()*.06-.03)))):0};
+}
 
 /* ===== Data ===== */
 function initSeries(){
@@ -361,26 +448,19 @@ function initSeries(){
   const walk=(cur,d,lo,hi,r=1)=>{const a=[cur];for(let i=1;i<N;i++)a.unshift(roundTo(drift(a[0],d,lo,hi),r));return a};
   series.temp=walk(current.temp,.6,18,35);
   series.humidity=walk(current.humidity,2.5,40,98,0);
-  series.wind=walk(current.wind,2,0,35);
   series.pressure=walk(current.pressure,.5,1000,1020);
-  series.solar=walk(current.solar,60,50,1100,0);
-  series.rain=Array.from({length:N},()=>roundTo(Math.random()<.6?0:Math.random()*6));
-  series.rain[N-1]=current.rain;
-  let d=current.windDir;series.windDir=[d];
-  for(let i=1;i<N;i++){d=(d+Math.round(Math.random()*20-10)+360)%360;series.windDir.unshift(d)}
+  const sim=times.map(t=>stepWeather(t));
+  ['wind','windDir','rain','solar'].forEach(k=>{series[k]=sim.map(x=>x[k]);current[k]=series[k][N-1]});
   ['temp','humidity','pressure','solar','wind'].forEach(k=>previous[k]=series[k][N-2]);
 }
 function generateNewValues(){
   previous={...current};
   current.temp=roundTo(drift(current.temp,.8,18,35));
   current.humidity=Math.round(drift(current.humidity,3,40,98));
-  current.wind=roundTo(drift(current.wind,2,0,35));
-  current.windDir=(Math.round(current.windDir+Math.random()*30-15)+360)%360;
   current.pressure=roundTo(drift(current.pressure,.8,1000,1020));
-  current.rain=roundTo(Math.random()<.6?0:Math.random()*8);
-  const h=new Date().getUTCHours();
-  current.solar=(h>=22||h<=11)?Math.round(drift(current.solar,80,50,1100)):Math.round(Math.random()*5);
-  times.push(new Date());
+  const now=new Date();
+  Object.assign(current,stepWeather(now));
+  times.push(now);
   Object.keys(series).forEach(k=>series[k].push(current[k]));
   if(times.length>N){times.shift();Object.values(series).forEach(a=>a.shift())}
 }
@@ -399,10 +479,10 @@ function buildCards(){
 }
 function info(k){
   const c=current,s=series;
-  if(k==='temp'){const e=c.humidity/100*6.105*Math.exp(17.27*c.temp/(237.7+c.temp)),at=c.temp+.33*e-.7*c.wind/3.6-4;return{b:c.temp<24?'Sejuk':c.temp<=31?'Normal':'Panas',ex:`Terasa ${f1(at)} °C`}}
+  if(k==='temp'){const e=c.humidity/100*6.105*Math.exp(17.27*c.temp/(237.7+c.temp)),at=c.temp+.33*e-.7*c.wind-4;return{b:c.temp<24?'Sejuk':c.temp<=31?'Normal':'Panas',ex:`Terasa ${f1(at)} °C`}}
   if(k==='humidity'){const g=Math.log(c.humidity/100)+17.62*c.temp/(243.12+c.temp),td=243.12*g/(17.62-g);return{b:c.humidity<40?'Kering':c.humidity<=70?'Nyaman':'Lembap',ex:`Titik embun ${f1(td)} °C`,bar:c.humidity}}
   if(k==='pressure'){const d=c.pressure-s.pressure[Math.max(0,s.pressure.length-7)];return{b:c.pressure<1005?'Rendah':c.pressure>1020?'Tinggi':'Normal',ex:`1 jam: ${d>=0?'+':''}${f1(d)} hPa`}}
-  if(k==='rain'){const r=c.rain,h=s.rain.slice(-6).reduce((a,b)=>a+b,0);return{b:r===0?'Tidak hujan':r<.4?'Ringan':r<1.3?'Sedang':'Lebat',ex:`1 jam: ${f1(h)} mm`,bar:r/8*100}}
+  if(k==='rain'){const r=c.rain,h=s.rain.slice(-6).reduce((a,b)=>a+b,0);return{b:r===0?'Tidak hujan':r<=.8?'Ringan':r<1.7?'Sedang':'Lebat',ex:`1 jam: ${f1(h)} mm`,bar:r/2*100}}
   const v=c.solar;return{b:v<100?'Rendah':v<=500?'Sedang':v<=800?'Tinggi':'Sangat tinggi',ex:`Puncak: ${Math.max(...s.solar)} W/m²`,bar:v/1200*100}
 }
 function trendHTML(k,u){
@@ -445,28 +525,37 @@ function buildCompass(){
   document.getElementById('compass').innerHTML=s;
 }
 let needleAng=null;
+/* Ayunan jarum: bergeser pelan tiap ~3,5-5 detik di sekitar arah data (dipakai juga oleh vane 3D agar sinkron) */
+let windSwing=0;
+function swingNeedle(){
+  const w=current.wind,amp=w<1?30:w<3?22:14;
+  windSwing=Math.round((Math.random()*2-1)*amp);
+  const n=document.getElementById('needle');
+  if(n&&needleAng!==null)n.style.transform=`rotate(${needleAng+windSwing}deg)`;
+  setTimeout(swingNeedle,3500+Math.random()*1500);
+}
 function renderCompass(){
   const t=current.windDir,dir=degreesToCompass(t);
   if(needleAng===null)needleAng=t;else needleAng+=((((t-needleAng)%360)+540)%360)-180;
-  document.getElementById('needle').style.transform=`rotate(${needleAng}deg)`;
+  document.getElementById('needle').style.transform=`rotate(${needleAng+windSwing}deg)`;
   document.getElementById('cp-dir').textContent=dir;
   document.getElementById('cp-dd').textContent=t+'°';
   document.getElementById('cp-caption').textContent=`Angin dari ${dir} (${t}°)`;
   const w6=series.wind.slice(-6),d6=series.windDir.slice(-6),b=beaufort(current.wind);
   const sx=d6.reduce((a,d)=>a+Math.sin(d*Math.PI/180),0),sy=d6.reduce((a,d)=>a+Math.cos(d*Math.PI/180),0);
   const avg=Math.round((Math.atan2(sx,sy)*180/Math.PI+360)%360);
-  document.getElementById('st-speed').textContent=f1(current.wind)+' km/h';
-  document.getElementById('st-ms').textContent=f1(current.wind/3.6)+' m/s';
+  document.getElementById('st-speed').textContent=f1(current.wind)+' m/s';
+  document.getElementById('st-ms').textContent=f1(current.wind*3.6)+' km/h';
   document.getElementById('st-bf').textContent='Bf '+b;
   document.getElementById('st-bft').textContent=BF_TXT[b];
-  document.getElementById('st-gust').textContent=f1(Math.max(...w6))+' km/h';
+  document.getElementById('st-gust').textContent=f1(Math.max(...w6))+' m/s';
   document.getElementById('st-avg').textContent=`${avg}° ${degreesToCompass(avg)}`;
 }
 
 /* ===== Grafik ===== */
 const CH={
   'ch-th':{h:260,series:[{k:'temp',c:'--c-temp',fill:1,lbl:'Suhu',u:'°C',d:1},{k:'humidity',c:'--c-hum',ax:'r',lbl:'Kelembapan',u:'%',d:0}]},
-  'ch-wind':{h:200,min0:1,series:[{k:'wind',c:'--c-wind',fill:1,lbl:'Angin',u:'km/h',d:1}]},
+  'ch-wind':{h:200,min0:1,series:[{k:'wind',c:'--c-wind',fill:1,lbl:'Angin',u:'m/s',d:1}]},
   'ch-pres':{h:200,series:[{k:'pressure',c:'--c-pres',fill:1,lbl:'Tekanan',u:'hPa',d:1}]}
 };
 function drawChart(id,cfg){
@@ -522,7 +611,7 @@ function renderTable(){
   document.getElementById('dataTable').innerHTML=rows.join('');
 }
 function downloadCSV(){
-  const r=['waktu_utc,suhu_c,kelembapan_persen,angin_kmh,arah_derajat,arah_mata_angin,tekanan_hpa,hujan_mm,radiasi_wm2'];
+  const r=['waktu_utc,suhu_c,kelembapan_persen,angin_ms,arah_derajat,arah_mata_angin,tekanan_hpa,hujan_mm,radiasi_wm2'];
   for(let i=times.length-1;i>=0;i--)r.push([times[i].toISOString(),series.temp[i],series.humidity[i],series.wind[i],series.windDir[i],degreesToCompass(series.windDir[i]),series.pressure[i],series.rain[i],series.solar[i]].join(','));
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.join('\n')],{type:'text/csv'}));a.download='aws-mit-data.csv';a.click();URL.revokeObjectURL(a.href);
 }
@@ -530,11 +619,12 @@ document.getElementById('csvBtn').addEventListener('click',downloadCSV);
 
 /* ===== Interaksi visual 3D ===== */
 const sceneSensors={
-  wind:{title:'ANGIN · KECEPATAN / ARAH',value:()=>`${current.wind.toFixed(1)} km/h · ${current.windDir}° ${degreesToCompass(current.windDir)}`,info:'Merk: Thies Clima\nSN: TC-WD-7K4M-26'},
+  wind:{title:'ANGIN · KECEPATAN / ARAH',value:()=>`${current.wind.toFixed(1)} m/s · ${current.windDir}° ${degreesToCompass(current.windDir)}`,info:'Merk: Thies Clima\nSN: TC-WD-7K4M-26'},
   air:{title:'SUHU · KELEMBAPAN (TRH)',value:()=>`${current.temp.toFixed(1)} °C · ${current.humidity}% RH`,info:'Merk: Thies Clima\nSN: TC-TRH-29A6-26'},
   rain:{title:'CURAH HUJAN · 10 MENIT',value:()=>`${current.rain.toFixed(1)} mm`,info:'Merk: TB4 Hygro\nSN: TB4H-8Q2N-26'},
   solar:{title:'RADIASI MATAHARI (SR)',value:()=>`${current.solar} W/m²`,info:'Merk: Thies Clima\nSN: TC-SR-5P8D-26'},
-  power:{title:'SISTEM CATU DAYA',value:()=>'Solar regulator · baterai 28 Ah',info:'Merk: SolarView\nSN: SV-PV-3M7K-26'}
+  power:{title:'SISTEM CATU DAYA',value:()=>'Solar regulator · baterai 28 Ah',info:'Merk: SolarView\nSN: SV-PV-3M7K-26'},
+  cctv:{title:'CCTV · PEMANTAU AREA',value:()=>'Aktif · merekam 24 jam',info:'Fungsi: pantau taman alat & keamanan\nRencana: deteksi objek berbasis YOLO'}
 };
 let activeSceneSensor=null;
 let cameraTourToken=0,cameraTourActive=false;
@@ -568,10 +658,11 @@ async function narrateTourStep(text,minDuration=8200){
   if(wait>0)await new Promise(resolve=>setTimeout(resolve,wait));
 }
 function sensorNarration(key){
-  if(key==='wind')return `Sensor angin Thies Clima mengukur kecepatan dan arah angin. Saat ini kecepatannya ${current.wind.toFixed(1)} kilometer per jam, dari arah ${degreesToCompass(current.windDir)}. Cawan anemometer berputar mengikuti angin.`;
+  if(key==='wind')return `Sensor angin Thies Clima mengukur kecepatan dan arah angin. Saat ini kecepatannya ${current.wind.toFixed(1)} meter per detik, dari arah ${degreesToCompass(current.windDir)}. Cawan anemometer berputar mengikuti angin.`;
   if(key==='air')return `Sensor suhu dan kelembapan relatif Thies Clima, atau TRH, memantau kondisi udara. Pembacaan saat ini ${current.temp.toFixed(1)} derajat Celsius dengan kelembapan ${current.humidity} persen.`;
   if(key==='rain')return `Penakar hujan TB4 Hygro mengukur curah hujan menggunakan mekanisme tipping bucket. Curah hujan pada pembacaan ini ${current.rain.toFixed(1)} milimeter.`;
   if(key==='solar')return `Sensor radiasi matahari Thies Clima mengukur energi surya yang diterima. Nilai saat ini ${current.solar} watt per meter persegi.`;
+  if(key==='cctv')return 'Kamera CCTV dipasang di sudut pagar untuk memantau kondisi taman alat dan menjaga keamanan peralatan stasiun. Citra dari kamera ini juga dapat dipakai untuk pengembangan AWS berbasis YOLO, yaitu deteksi objek otomatis seperti orang, hewan, atau kondisi cuaca.';
   return 'Sistem catu daya menggunakan panel surya SolarView. Energi disalurkan melalui regulator dan disimpan pada baterai di dalam kotak daya yang tertutup.';
 }
 function showSceneSensor(key,fromTour=false){
@@ -592,10 +683,10 @@ function stopCameraTour(resetView){
 }
 async function startCameraTour(){
   if(!window.AWS3D)return;
-  const token=++cameraTourToken,keys=['wind','air','rain','solar','power'];
+  const token=++cameraTourToken,keys=['wind','air','rain','solar','power','cctv'];
   cameraTourActive=true;cameraTourButton.classList.add('active');cameraTourButton.setAttribute('aria-pressed','true');
   stopTourSpeech();
-  await speakTour('Tur lokasi stasiun cuaca otomatis dimulai. Kita akan melihat sensor cuaca dan sistem catu dayanya.');
+  await speakTour('Tur lokasi stasiun cuaca otomatis dimulai. Kita akan melihat sensor cuaca, sistem catu daya, dan kamera CCTV.');
   if(token!==cameraTourToken)return;
   for(let i=0;i<keys.length;i++){
     if(token!==cameraTourToken)return;
@@ -610,11 +701,23 @@ async function startCameraTour(){
   cameraTourButton.innerHTML='<i class="fas fa-route"></i>Kembali ke awal…';
   await narrateTourStep('Tur sensor selesai. Kamera kembali ke tampilan keseluruhan. Teknisi akan masuk untuk memeriksa peralatan.',4200);
   if(token!==cameraTourToken)return;
+  let tourChain=Promise.resolve();
+  const say=t=>{tourChain=tourChain.then(()=>token===cameraTourToken?speakTour(t):null)}; // antrean berurutan, batal jika tur dihentikan
+  const spokenStops=new Set();
+  const STOP_TALK={
+    'Kamera CCTV · pemantau area':'Teknisi memeriksa kamera CCTV, memastikan lensa bersih dan arah kamera menghadap taman alat, untuk keamanan peralatan dan pengembangan YOLO.',
+    'Penakar hujan · TB4 Hygro':'Teknisi memeriksa penakar hujan, memastikan corong bersih dari kotoran dan mekanisme tipping bucket bergerak bebas.',
+    'Sensor suhu & kelembapan · TRH':'Teknisi memeriksa sensor suhu dan kelembapan, memastikan pelindung radiasi bersih dan tidak terhalang agar pembacaan akurat.',
+    'Sensor radiasi matahari · SR':'Teknisi memeriksa sensor radiasi matahari, memastikan kubah sensor bersih, tidak tergores, dan posisinya rata.',
+    'Kotak daya dan panel surya':'Teknisi memeriksa kotak daya dan panel surya, memastikan regulator dan baterai normal serta panel surya bersih dari debu.',
+    'Anemometer dan penunjuk arah angin':'Teknisi memeriksa anemometer dan penunjuk arah angin, memastikan cawan dan baling-baling berputar bebas.'
+  };
   await window.AWS3D.runTechnician(status=>{
     if(token!==cameraTourToken)return;
     cameraTourButton.innerHTML=`<i class="fas fa-route"></i>${status}`;
-    if(status.startsWith('Teknisi menuju taman alat'))speakTour('Teknisi membuka gerbang dan berjalan menuju taman alat untuk melakukan pemeriksaan.');
-    else if(status.startsWith('Pemeriksaan selesai, teknisi kembali'))speakTour('Pemeriksaan peralatan selesai. Teknisi berjalan kembali dan menutup gerbang.');
+    if(status.startsWith('Teknisi menuju taman alat'))say('Teknisi membuka gerbang dan berjalan menuju taman alat untuk melakukan pemeriksaan.');
+    else if(status.startsWith('Memeriksa ')){const name=status.slice(10).replace(/ · 00:\d\d$/,'');if(!spokenStops.has(name)&&STOP_TALK[name]){spokenStops.add(name);say(STOP_TALK[name])}}
+    else if(status.startsWith('Pemeriksaan selesai, teknisi kembali'))say('Pemeriksaan peralatan selesai. Teknisi berjalan kembali dan menutup gerbang.');
   });
   if(token===cameraTourToken)finishCameraTourUi();
 }
@@ -654,9 +757,227 @@ function init(){
   document.getElementById('yr').textContent=new Date().getFullYear();
   initSeries();buildCards();buildCompass();
   renderCards();renderCompass();renderTable();renderCharts();tick();
+  swingNeedle();
   setInterval(tick,1000);
   setInterval(performUpdate,UPDATE_INTERVAL_MS);
 }
+/* ===== Asisten suara: tanya lewat mikrofon, dijawab dari data dasbor lewat speaker ===== */
+const DIR_ID=['utara','utara timur laut','timur laut','timur timur laut','timur','timur tenggara','tenggara','selatan tenggara','selatan','selatan barat daya','barat daya','barat barat daya','barat','barat barat laut','barat laut','utara barat laut'];
+const dirName=deg=>DIR_ID[Math.round(deg/22.5)%16];
+const VQ={
+  temp:{name:'Suhu udara',u:'°C',d:1},
+  humidity:{name:'Kelembapan udara',u:'%',d:0},
+  pressure:{name:'Tekanan udara',u:'hPa',d:1},
+  wind:{name:'Kecepatan angin',u:'m/s',d:1},
+  rain:{name:'Curah hujan per 10 menit',u:'mm',d:1},
+  solar:{name:'Radiasi matahari',u:'W/m²',d:0}
+};
+const vfmt=(k,v)=>{const q=VQ[k];return v.toFixed(q.d)+(q.u==='%'?'%':' '+q.u)};
+const wibTime=d=>pad((d.getUTCHours()+7)%24)+':'+pad(d.getUTCMinutes())+' WIB';
+const vaSpeech=t=>t.replace(/(\d{1,2}):(\d{2})/g,(m,h,mi)=>+mi?`${+h} lewat ${+mi} menit`:`${+h} tepat`).replace(/(\d)\.(\d)/g,'$1,$2').replace(/°C/g,'derajat Celsius').replace(/°/g,' derajat').replace(/hPa/g,'hektopaskal').replace(/W\/m²/g,'watt per meter persegi').replace(/m\/s/g,'meter per detik').replace(/\bmm\b/g,'milimeter').replace(/%/g,' persen').replace(/WIB/g,'W I B').replace(/CCTV/g,'C C T V').replace(/YOLO/g,'Yolo');
+
+function vaCurrent(k){
+  const c=current,L=series[k].length;
+  if(k==='wind'){const b=beaufort(c.wind),w6=series.wind.slice(-6);return `Angin bertiup ${vfmt('wind',c.wind)} dari arah ${dirName(c.windDir)} (${c.windDir}°), ${BF_TXT[b].toLowerCase()} pada skala Beaufort ${b}. Hembusan maksimum 1 jam terakhir ${vfmt('wind',Math.max(...w6))}.`}
+  const i=info(k);
+  if(k==='temp')return `Suhu udara saat ini ${vfmt(k,c.temp)}, ${i.b.toLowerCase()}. ${i.ex}.`;
+  if(k==='humidity')return `Kelembapan udara saat ini ${vfmt(k,c.humidity)}, ${i.b.toLowerCase()}. ${i.ex}.`;
+  if(k==='pressure'){const d=c.pressure-series.pressure[Math.max(0,L-7)];return `Tekanan udara saat ini ${vfmt(k,c.pressure)}, ${i.b.toLowerCase()}. Dalam 1 jam terakhir ${Math.abs(d)<.05?'tidak berubah':(d>0?'naik ':'turun ')+Math.abs(d).toFixed(1)+' hPa'}.`}
+  if(k==='rain'){const h=series.rain.slice(-6).reduce((a,b)=>a+b,0);return c.rain===0?`Saat ini tidak hujan. Akumulasi 1 jam terakhir ${vfmt('rain',h)}.`:`Saat ini hujan ${i.b.toLowerCase()}, ${vfmt('rain',c.rain)} dalam 10 menit terakhir. Akumulasi 1 jam terakhir ${vfmt('rain',h)}.`}
+  return c.solar===0?`Radiasi matahari saat ini 0 W/m², belum ada sinar matahari (malam hari).`:`Radiasi matahari saat ini ${vfmt('solar',c.solar)}, ${i.b.toLowerCase()}. Puncak 4 jam terakhir ${vfmt('solar',Math.max(...series.solar))}.`;
+}
+function vaStat(k,mode){
+  const a=series[k],q=VQ[k],last=a[a.length-1];
+  if(mode==='trend'){const d=last-a[a.length-2];return Math.abs(d)<.5*10**-q.d?`${q.name} tidak berubah dari 10 menit lalu, sekarang ${vfmt(k,last)}.`:`${q.name} ${d>0?'naik':'turun'} ${vfmt(k,Math.abs(d))} dari 10 menit lalu, sekarang ${vfmt(k,last)}.`}
+  if(mode==='avg')return `Rata-rata ${q.name.toLowerCase()} sekitar 4 jam terakhir ${vfmt(k,a.reduce((x,y)=>x+y,0)/a.length)}.`;
+  const v=mode==='max'?Math.max(...a):Math.min(...a),i=a.lastIndexOf(v);
+  return `${q.name} ${mode==='max'?'tertinggi':'terendah'} dalam sekitar 4 jam terakhir ${vfmt(k,v)}, tercatat pukul ${wibTime(times[i])}.`;
+}
+function vaSummary(){
+  const c=current;
+  return `Kondisi terakhir pukul ${wibTime(times[times.length-1])}. Suhu ${vfmt('temp',c.temp)}. Kelembapan ${vfmt('humidity',c.humidity)}. Tekanan ${vfmt('pressure',c.pressure)}. Angin ${vfmt('wind',c.wind)} dari arah ${dirName(c.windDir)}. Curah hujan ${vfmt('rain',c.rain)}, ${info('rain').b.toLowerCase()}. Radiasi matahari ${vfmt('solar',c.solar)}.`;
+}
+function vaAnswer(q){
+  const t=' '+q.toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ')+' ';
+  const has=r=>r.test(t);
+  const keys=[];
+  if(has(/\b(suhu|temperatur|temperature)\b/))keys.push('temp');
+  if(has(/\b(kelembapan|kelembaban|lembap|lembab|humidity|rh)\b/))keys.push('humidity');
+  if(has(/\b(tekanan|barometer|pressure|hpa)\b/))keys.push('pressure');
+  if(has(/\b(angin|kecepatan|wind|hembusan|beaufort|arah)\b/))keys.push('wind');
+  if(has(/\b(hujan|curah|rain|gerimis)\b/))keys.push('rain');
+  if(has(/\b(radiasi|matahari|solar|sinar|terik|pyranometer)\b/))keys.push('solar');
+  if(!keys.length&&has(/\b(panas|dingin|gerah|sejuk)\b/))keys.push('temp');
+  const mode=has(/\b(tertinggi|maksimum|maksimal|puncak|paling tinggi|paling panas|paling kencang|paling deras)\b/)?'max':has(/\b(terendah|minimum|minimal|paling rendah|paling dingin|paling pelan)\b/)?'min':has(/\brata\b/)?'avg':has(/\b(tren|naik|turun|berubah|dibanding|dibandingkan)\b/)?'trend':null;
+  if(keys.length)return keys.map(k=>mode?vaStat(k,mode):vaCurrent(k)).join(' ');
+  if(has(/\b(cctv|kamera|yolo)\b/))return 'Kamera CCTV dipasang di sudut pagar untuk memantau kondisi taman alat dan menjaga keamanan peralatan stasiun. Citranya juga dapat dipakai untuk pengembangan AWS berbasis YOLO, yaitu deteksi objek otomatis seperti orang, hewan, atau kondisi cuaca.';
+  if(has(/\b(kapan|berikutnya|pembaruan|diperbarui|update|jam berapa|pukul)\b/)){const r=Math.max(0,nextUpdateTime-Date.now()),m=Math.floor(r/60000),sc=Math.floor(r/1000)%60;return `Data diperbarui setiap 10 menit. Data terakhir pukul ${wibTime(times[times.length-1])}. Pembaruan berikutnya sekitar ${m} menit ${sc} detik lagi.`}
+  if(has(/\b(semua|seluruh|ringkas|ringkasan|rangkum|rangkuman|kondisi|cuaca|keadaan|status|laporan)\b/))return vaSummary();
+  if(has(/\b(sensor|peralatan|alat apa)\b/))return 'Stasiun ini memiliki sensor angin, suhu dan kelembapan, tekanan udara, penakar hujan, radiasi matahari, panel surya dengan baterai 28 amper jam, serta kamera CCTV.';
+  if(has(/\b(bantuan|bantu|bisa apa|perkenalan|siapa kamu|halo|hai)\b/))return 'Saya asisten virtual stasiun cuaca ini. Tanyakan suhu, kelembapan, tekanan, angin, hujan, radiasi matahari, kondisi saat ini, nilai tertinggi atau terendah, atau kapan data diperbarui.';
+  return 'Maaf, saya belum paham pertanyaannya. Coba tanyakan suhu, kelembapan, tekanan, angin, hujan, radiasi matahari, atau kondisi saat ini.';
+}
+
+const VA_SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const va={fab:document.getElementById('awsBtnVoice'),panel:document.getElementById('vaPanel'),status:document.getElementById('vaStatus'),q:document.getElementById('vaQ'),a:document.getElementById('vaA'),mic:document.getElementById('vaMic'),input:document.getElementById('vaInput')};
+let vaState='idle',vaRec=null;
+const VA_MSG={idle:VA_SR?'Tekan tombol “Tekan untuk bicara”, lalu ucapkan pertanyaan. Atau ketik di bawah.':'Browser ini belum mendukung mikrofon. Silakan ketik pertanyaan.',listening:'Mendengarkan… silakan bicara.',speaking:'Asisten sedang menjawab… tekan tombol untuk berhenti.'};
+function vaSetState(st,msg){
+  vaState=st;
+  va.mic.classList.toggle('listening',st==='listening');
+  va.mic.classList.toggle('speaking',st==='speaking');
+  va.mic.innerHTML=st==='speaking'?'<i class="fas fa-stop"></i><span>Hentikan suara</span>':st==='listening'?'<i class="fas fa-microphone"></i><span>Mendengarkan… tekan untuk berhenti</span>':'<i class="fas fa-microphone"></i><span>Tekan untuk bicara</span>';
+  va.status.textContent=msg||VA_MSG[st];
+}
+function vaStopSpeaking(){if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+function vaSpeak(text){
+  if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined'){vaSetState('idle','Speaker tidak didukung browser ini, jawaban hanya ditampilkan.');return}
+  const synth=window.speechSynthesis;synth.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(vaSpeech(text));
+    u.lang='id-ID';u.rate=.95;u.pitch=1;u.volume=1;
+    const v=synth.getVoices().find(x=>/^id(-|$)/i.test(x.lang));if(v)u.voice=v;
+    u.onstart=()=>vaSetState('speaking');
+    u.onend=u.onerror=()=>{if(vaState==='speaking')vaSetState('idle')};
+    synth.speak(u);
+  },60);
+}
+function vaAsk(text){
+  text=(text||'').trim();if(!text)return;
+  if(typeof cameraTourActive!=='undefined'&&cameraTourActive)stopCameraTour(false);
+  const ans=vaAnswer(text);
+  va.q.textContent=text;va.a.textContent=ans;
+  vaSpeak(ans);
+}
+function vaListen(){
+  if(!VA_SR){vaSetState('idle','Browser ini belum mendukung mikrofon (coba Chrome atau Edge). Silakan ketik pertanyaan.');return}
+  vaStopSpeaking();
+  let finalText='',errored=false;
+  const r=new VA_SR();vaRec=r;
+  r.lang='id-ID';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+  r.onstart=()=>vaSetState('listening');
+  r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)finalText+=x[0].transcript;else interim+=x[0].transcript}va.q.textContent=finalText||interim};
+  r.onerror=e=>{
+    errored=true;
+    const m={'not-allowed':'Izin mikrofon ditolak. Aktifkan izin mikrofon di pengaturan browser.','service-not-allowed':'Izin mikrofon ditolak. Aktifkan izin mikrofon di pengaturan browser.','no-speech':'Tidak ada suara terdengar. Coba lagi.','audio-capture':'Mikrofon tidak ditemukan.','network':'Pengenalan suara butuh koneksi internet.'};
+    vaSetState('idle',m[e.error]||'Gagal mendengarkan ('+e.error+').');
+  };
+  r.onend=()=>{vaRec=null;if(errored)return;if(finalText.trim()){vaSetState('idle');vaAsk(finalText)}else vaSetState('idle','Tidak ada suara terdengar. Coba lagi.')};
+  try{r.start()}catch(e){vaSetState('idle','Mikrofon belum siap, coba lagi.')}
+}
+va.mic.addEventListener('click',()=>{
+  if(vaState==='speaking'){vaStopSpeaking();vaSetState('idle');return}
+  if(vaState==='listening'){if(vaRec)vaRec.stop();return}
+  vaListen();
+});
+function vaTogglePanel(open){
+  open=open==null?va.panel.hidden:open;
+  va.panel.hidden=!open;
+  va.fab.setAttribute('aria-expanded',String(open));va.fab.setAttribute('aria-pressed',String(open));va.fab.classList.toggle('active',open);
+  if(open){if(vaState==='idle')vaSetState('idle');if(!VA_SR)va.input.focus({preventScroll:true})}
+  else{if(vaRec)vaRec.abort();vaStopSpeaking();vaSetState('idle')}
+}
+va.fab.addEventListener('click',()=>{vaTogglePanel();if(!va.panel.hidden&&VA_SR&&vaState==='idle')vaListen()});
+document.getElementById('vaClose').addEventListener('click',()=>vaTogglePanel(false));
+document.getElementById('vaSend').addEventListener('click',()=>{vaAsk(va.input.value);va.input.value=''});
+va.input.addEventListener('keydown',e=>{if(e.key==='Enter'){vaAsk(va.input.value);va.input.value=''}});
+document.getElementById('vaChips').addEventListener('click',e=>{const b=e.target.closest('button');if(b)vaAsk(b.textContent)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!va.panel.hidden)vaTogglePanel(false)});
+vaSetState('idle');
+
+/* ===== Gesture tangan: gerakkan jari telunjuk sebagai penunjuk, cubit (jempol + telunjuk) untuk klik tombol 3D ===== */
+const GS_CDN='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const GS_MODEL='https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+const GS_SEL='.scene-foot button';
+const gs={on:false,loading:false,landmarker:null,stream:null,raf:0,x:0,y:0,has:false,hist:[],pinch:false,lastClick:0,hover:null,lastT:-1,hideTimer:0};
+const gsEl={btn:document.getElementById('awsBtnGesture'),cam:document.getElementById('gsCam'),video:document.getElementById('gsVideo'),canvas:document.getElementById('gsCanvas'),status:document.getElementById('gsStatus'),cursor:document.getElementById('gsCursor')};
+const gsSay=m=>{gsEl.status.textContent=m};
+async function gsLoadModel(){
+  const vision=await import(GS_CDN+'/vision_bundle.mjs');
+  const fileset=await vision.FilesetResolver.forVisionTasks(GS_CDN+'/wasm');
+  const opts=d=>({baseOptions:{modelAssetPath:GS_MODEL,delegate:d},runningMode:'VIDEO',numHands:1,minHandDetectionConfidence:.6,minHandPresenceConfidence:.6,minTrackingConfidence:.5});
+  try{gs.landmarker=await vision.HandLandmarker.createFromOptions(fileset,opts('GPU'))}
+  catch(e){gs.landmarker=await vision.HandLandmarker.createFromOptions(fileset,opts('CPU'))}
+}
+function gsClearHover(){if(gs.hover){gs.hover.classList.remove('gs-hover');gs.hover=null}}
+function gsTargetAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest(GS_SEL):null}
+function gsStop(msg){
+  gs.on=false;cancelAnimationFrame(gs.raf);
+  if(gs.stream){gs.stream.getTracks().forEach(t=>t.stop());gs.stream=null}
+  gsEl.video.srcObject=null;
+  gsClearHover();gs.has=false;gs.pinch=false;gs.hist=[];
+  gsEl.cursor.hidden=true;gsEl.cursor.classList.remove('pinch');
+  gsEl.btn.classList.remove('active');gsEl.btn.setAttribute('aria-pressed','false');
+  clearTimeout(gs.hideTimer);
+  if(msg){gsSay(msg);gsEl.cam.hidden=false;gs.hideTimer=setTimeout(()=>{if(!gs.on&&!gs.loading)gsEl.cam.hidden=true},7000)}
+  else gsEl.cam.hidden=true;
+}
+async function gsStart(){
+  if(gs.loading||gs.on)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){gsStop('Browser ini tidak mendukung kamera. Gunakan Chrome atau Edge lewat https atau localhost.');return}
+  gs.loading=true;clearTimeout(gs.hideTimer);gsEl.cam.hidden=false;
+  try{
+    gsSay('Memuat model deteksi tangan… (butuh internet)');
+    if(!gs.landmarker)await gsLoadModel();
+    gsSay('Meminta izin kamera…');
+    gs.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+    gsEl.video.srcObject=gs.stream;await gsEl.video.play();
+    gsEl.canvas.width=gsEl.video.videoWidth||640;gsEl.canvas.height=gsEl.video.videoHeight||480;
+    gs.on=true;gs.lastT=-1;
+    gsEl.btn.classList.add('active');gsEl.btn.setAttribute('aria-pressed','true');
+    gsSay('Arahkan telunjuk ke tombol, lalu cubit jempol dan telunjuk untuk klik.');
+    const sc=document.getElementById('awsScene3d');if(sc)sc.scrollIntoView({behavior:'smooth',block:'center'});
+    gs.raf=requestAnimationFrame(gsLoop);
+  }catch(e){
+    const m={NotAllowedError:'Izin kamera ditolak. Aktifkan izin kamera di pengaturan browser.',NotFoundError:'Kamera tidak ditemukan.',NotReadableError:'Kamera sedang dipakai aplikasi lain.'};
+    gsStop(m[e&&e.name]||'Gagal memuat gesture tangan (butuh internet untuk model): '+((e&&e.message)||e));
+  }
+  gs.loading=false;
+}
+function gsLoop(){
+  if(!gs.on)return;
+  gs.raf=requestAnimationFrame(gsLoop);
+  const v=gsEl.video;
+  if(v.readyState<2||v.currentTime===gs.lastT)return;
+  gs.lastT=v.currentTime;
+  let res;try{res=gs.landmarker.detectForVideo(v,performance.now())}catch(e){return}
+  const cv=gsEl.canvas,ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+  const lm=res&&res.landmarks&&res.landmarks[0];
+  if(!lm){
+    gs.has=false;gs.pinch=false;gsEl.cursor.hidden=true;gsClearHover();
+    gsSay('Arahkan tangan ke kamera.');return;
+  }
+  const W=v.videoWidth||cv.width,H=v.videoHeight||cv.height;
+  const dist=(a,b)=>Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);
+  // penunjuk = ujung telunjuk (dicerminkan), dipetakan ke seluruh layar dengan margin tepi, lalu dihaluskan
+  const tip=lm[8],th=lm[4];
+  const tx=Math.min(1,Math.max(0,((1-tip.x)-.15)/.7))*innerWidth,ty=Math.min(1,Math.max(0,(tip.y-.1)/.7))*innerHeight;
+  if(!gs.has){gs.x=tx;gs.y=ty;gs.has=true}else{gs.x+=(tx-gs.x)*.4;gs.y+=(ty-gs.y)*.4}
+  const now=performance.now();
+  gs.hist.push({t:now,x:gs.x,y:gs.y});while(gs.hist.length&&now-gs.hist[0].t>400)gs.hist.shift();
+  gsEl.cursor.hidden=false;gsEl.cursor.style.transform=`translate(${gs.x.toFixed(1)}px,${gs.y.toFixed(1)}px)`;
+  const target=gsTargetAt(gs.x,gs.y);
+  if(target!==gs.hover){gsClearHover();if(target){target.classList.add('gs-hover');gs.hover=target}}
+  // cubitan: jarak ujung jempol-telunjuk dibanding ukuran telapak (pergelangan ke pangkal jari tengah)
+  const ratio=dist(lm[4],lm[8])/(dist(lm[0],lm[9])||1);
+  if(!gs.pinch&&ratio<.28){
+    gs.pinch=true;gsEl.cursor.classList.add('pinch');
+    if(now-gs.lastClick>700){
+      const past=gs.hist.find(h=>now-h.t<=200)||{x:gs.x,y:gs.y}; // posisi sesaat sebelum cubitan, supaya tidak meleset
+      const t=gsTargetAt(past.x,past.y)||gs.hover;
+      if(t){gs.lastClick=now;gsSay('Klik: '+(t.textContent.trim()||'tombol'));t.click()}
+    }
+  }else if(gs.pinch&&ratio>.42){gs.pinch=false;gsEl.cursor.classList.remove('pinch')}
+  if(!gs.pinch&&now-gs.lastClick>1500)gsSay(target?'Cubit untuk klik: '+target.textContent.trim():'Tangan terdeteksi · arahkan ke tombol.');
+  // gambar titik tangan di pratinjau
+  ctx.fillStyle='rgba(34,211,238,.9)';
+  lm.forEach(p=>{ctx.beginPath();ctx.arc(p.x*cv.width,p.y*cv.height,3,0,7);ctx.fill()});
+  ctx.strokeStyle=gs.pinch?'#f87171':'#fbbf24';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(th.x*cv.width,th.y*cv.height);ctx.lineTo(tip.x*cv.width,tip.y*cv.height);ctx.stroke();
+}
+gsEl.btn.addEventListener('click',()=>gs.on?gsStop():gsStart());
+document.getElementById('gsClose').addEventListener('click',()=>gsStop());
+
 init();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1032,6 +1353,31 @@ init();
     cyl(gatePivot, 0.025, 1.24, metal, 1.16, 0.66, 0, 12);
     box(gatePivot, 0.1, 0.12, 0.06, dark, 1.12, 0.66, 0.02);
 
+    // CCTV di satu sudut pagar (depan kiri, di sebelah kiri pintu): tiang, kamera menghadap ke dalam area, menoleh pelan, LED merah berkedip.
+    const cctvs = [];
+    const cctvLedMat = new THREE.MeshStandardMaterial({ color: 0xff3b30, emissive: 0xff2a1f, emissiveIntensity: 1.5, roughness: 0.3 });
+    const lensMat = new THREE.MeshStandardMaterial({ color: 0x0b1a2b, emissive: 0x1d5f9e, emissiveIntensity: 0.5, roughness: 0.15, metalness: 0.6 });
+    [[-H, H]].forEach((c, i) => {
+        const cx = c[0], cz = c[1];
+        cyl(scene, 0.035, 2.1, grey, cx, 1.05, cz, 12);
+        cyl(scene, 0.05, 0.04, dark, cx, 0.02, cz, 12);
+        const pan = new THREE.Group();
+        pan.position.set(cx, 2.1, cz);
+        pan.userData.base = Math.atan2(cz, -cx);
+        pan.rotation.y = pan.userData.base;
+        scene.add(pan);
+        box(pan, 0.1, 0.05, 0.07, dark, 0, 0.02, 0);
+        const tilt = new THREE.Group();
+        tilt.position.set(0.02, 0.09, 0);
+        tilt.rotation.z = -0.32;
+        pan.add(tilt);
+        add(tilt, new THREE.CylinderGeometry(0.04, 0.04, 0.26, 16), white, 0.04, 0, 0).rotation.z = Math.PI / 2;
+        box(tilt, 0.17, 0.012, 0.11, white, 0.075, 0.052, 0);
+        add(tilt, new THREE.CylinderGeometry(0.032, 0.032, 0.02, 16), lensMat, 0.175, 0, 0, false).rotation.z = Math.PI / 2;
+        add(tilt, new THREE.SphereGeometry(0.009, 8, 6), cctvLedMat, 0.15, 0.03, 0.035, false);
+        cctvs.push(pan);
+    });
+
     // Teknisi low-poly untuk animasi inspeksi setelah tur kamera.
     const technician = new THREE.Group();
     technician.visible = false;
@@ -1109,7 +1455,8 @@ init();
         ['Suhu & kelembapan', 'Pelindung radiasi (shield)', [0, 2.22, 0.58], 'l'],
         ['Penakar hujan', 'Tipping bucket', [1.3, 1.3, 0.9], 'r'],
         ['Kotak daya IP-rated', 'Solar regulator + baterai 28Ah', [-1.45, 0.55, -0.84], 'l'],
-        ['Pagar taman alat', 'Area terlindungi', [2.5, 0.95, 1.2], 'r']
+        ['Pagar taman alat', 'Area terlindungi', [2.5, 0.95, 1.2], 'r'],
+        ['CCTV', 'Pemantau area 24 jam', [-2.5, 2.25, 2.5], 'r']
     ];
     const labels = labelData.map(l => {
         const d = document.createElement('div');
@@ -1124,7 +1471,8 @@ init();
         air: { pos: V(0, 2.22, 0.58), tgt: V(0, 2.2, 0.4), cam: V(1.5, 2.6, 2.3) },
         rain: { pos: V(1.3, 1.33, 0.9), tgt: V(1.3, 1.2, 0.9), cam: V(2.7, 1.9, 2.7) },
         solar: { pos: V(0.5, 3.56, 0), tgt: V(0.3, 3.4, -0.1), cam: V(2.0, 3.9, 2.0) },
-        power: { pos: V(-1.45, 0.55, -0.84), tgt: V(-1.45, 0.5, -1.0), cam: V(-0.9, 1.3, 1.2) }
+        power: { pos: V(-1.45, 0.55, -0.84), tgt: V(-1.45, 0.5, -1.0), cam: V(-0.9, 1.3, 1.2) },
+        cctv: { pos: V(-2.5, 2.15, 2.5), tgt: V(-2.5, 2.0, 2.5), cam: V(-1.2, 2.7, 1.3) }
     };
 
     let focus = null, anim = null, showLabels = true;
@@ -1179,6 +1527,7 @@ init();
     new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(wrap);
 
     let vAng = Math.PI / 2, rotSpeed = 0, t0 = performance.now();
+    let vaneOffset = 0, nextVaneStep = 0;
     const sceneStart = t0;
     let gateTarget = 0;
     const gateButton = document.getElementById('awsBtnGate');
@@ -1191,6 +1540,7 @@ init();
     const techState = { phase: 'hidden', timer: 0, path: [], pathIndex: 0, stopIndex: 0, walkCycle: 0, lastSecond: -1, resolve: null, notify: null, cancelRequested: false };
     const techPathIn = [
         { p: V(0,0,1.8) },
+        { p: V(-1.85,0,1.85), check: 'Kamera CCTV · pemantau area' },
         { p: V(0.95,0,1.15), check: 'Penakar hujan · TB4 Hygro' },
         { p: V(0.72,0,0.55), check: 'Sensor suhu & kelembapan · TRH' },
         { p: V(0.75,0,-0.25), check: 'Sensor radiasi matahari · SR' },
@@ -1297,7 +1647,7 @@ init();
             techTorso.rotation.x = Math.sin(t * 0.0012) * 0.025;
             if (techState.timer <= 0) {
                 techState.stopIndex++;
-                if (techState.stopIndex >= 5) { techState.phase = 'exitWait'; techState.timer = 0.8; setGate(true); reportTech('Pemeriksaan selesai, teknisi kembali…'); }
+                if (techState.stopIndex >= 6) { techState.phase = 'exitWait'; techState.timer = 0.8; setGate(true); reportTech('Pemeriksaan selesai, teknisi kembali…'); }
                 else { techState.phase = 'walkIn'; techArms.forEach(a => { a.rotation.set(0,0,0); }); techHead.rotation.set(0,0,0); techTorso.rotation.set(0,0,0); }
             }
         }
@@ -1319,12 +1669,15 @@ init();
         const dt = Math.min((t - t0) / 1000, 0.05);
         t0 = t;
         if (!visible) return;
-        const cur = (typeof current !== 'undefined') ? current : { wind: 4, windDir: 45 };
+        const cur = (typeof current !== 'undefined') ? current : { wind: 1.5, windDir: 45 };
         gatePivot.rotation.y += (gateTarget - gatePivot.rotation.y) * Math.min(dt * 5, 1);
         if (Math.abs(gateTarget - gatePivot.rotation.y) < 0.004) gatePivot.rotation.y = gateTarget;
         const ledOn = Math.sin(t * 0.003) > 0;
         ledMat.emissiveIntensity = ledOn ? 1.8 : 0.12;
         ledGlowMat.opacity = ledOn ? 0.28 : 0.035;
+        const camBlink = Math.sin(t * 0.0022) > 0.2;
+        cctvLedMat.emissiveIntensity = camBlink ? 1.8 : 0.1;
+        cctvs.forEach((c, i) => { c.rotation.y = c.userData.base + Math.sin(t * 0.0005 + i * 1.7) * 0.5; });
         animateTechnician(dt, t);
         if (!reducedMotion) {
             const elapsed = (t - sceneStart) / 1000;
@@ -1338,12 +1691,18 @@ init();
                 b.userData.wings[1].rotation.z = -Math.sin(t * 0.012 + i) * 0.48;
             });
         }
-        const targetSpeed = (cur.wind / 3.6) * 1.4;
+        const targetSpeed = cur.wind * 1.4;
         rotSpeed += (targetSpeed - rotSpeed) * Math.min(dt * 2, 1);
         rotor.rotation.y -= rotSpeed * dt;
-        const target = Math.PI / 2 - cur.windDir * Math.PI / 180 + Math.sin(t / 700) * 0.03;
+        // arah berayun pelan tiap ~3,5-5 detik di sekitar arah data (rata-rata tetap = windDir), lebih liar saat angin lemah
+        if (t >= nextVaneStep) {
+            const amp = cur.wind < 1 ? 30 : cur.wind < 3 ? 22 : 14;
+            vaneOffset = (Math.random() * 2 - 1) * amp;
+            nextVaneStep = t + 3500 + Math.random() * 1500;
+        }
+        const target = Math.PI / 2 - (cur.windDir + (typeof windSwing !== 'undefined' ? windSwing : vaneOffset)) * Math.PI / 180;
         const diff = Math.atan2(Math.sin(target - vAng), Math.cos(target - vAng));
-        vAng += diff * Math.min(dt * 3, 1);
+        vAng += diff * Math.min(dt * 1.6, 1);
         vane.rotation.y = vAng;
         if (anim) {
             const k = Math.min(dt * anim.speed, 1);
