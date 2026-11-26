@@ -399,6 +399,7 @@ tr.new td{animation:row 2s}
 <div id="gsCursor" class="gs-cursor" hidden></div>
 <script>
 const UPDATE_INTERVAL_MS=10*60*1000,N=24,TABLE_ROWS=12;
+const slotStart=ms=>Math.floor(ms/UPDATE_INTERVAL_MS)*UPDATE_INTERVAL_MS; // pembulatan ke bawah ke kelipatan 10 menit (menit 00,10,20,30,40,50)
 let current={temp:28.5,humidity:78,wind:12.4,windDir:245,pressure:1012.8,rain:3.2,solar:682};
 let previous={...current};
 const series={temp:[],humidity:[],wind:[],windDir:[],pressure:[],rain:[],solar:[]};
@@ -443,7 +444,7 @@ function stepWeather(date){
 
 /* ===== Data ===== */
 function initSeries(){
-  const now=Date.now();
+  const now=slotStart(Date.now());
   times=Array.from({length:N},(_,i)=>new Date(now-(N-1-i)*UPDATE_INTERVAL_MS));
   const walk=(cur,d,lo,hi,r=1)=>{const a=[cur];for(let i=1;i<N;i++)a.unshift(roundTo(drift(a[0],d,lo,hi),r));return a};
   series.temp=walk(current.temp,.6,18,35);
@@ -458,7 +459,7 @@ function generateNewValues(){
   current.temp=roundTo(drift(current.temp,.8,18,35));
   current.humidity=Math.round(drift(current.humidity,3,40,98));
   current.pressure=roundTo(drift(current.pressure,.8,1000,1020));
-  const now=new Date();
+  const now=new Date(slotStart(Date.now()));
   Object.assign(current,stepWeather(now));
   times.push(now);
   Object.keys(series).forEach(k=>series[k].push(current[k]));
@@ -726,7 +727,7 @@ document.querySelectorAll('[data-scene-sensor]').forEach(b=>{b.setAttribute('ari
 function refreshSceneReading(){if(activeSceneSensor&&window.AWS3D)window.AWS3D.setReading(sceneSensors[activeSceneSensor].value())}
 
 /* ===== Jam, countdown, tema ===== */
-let nextUpdateTime=Date.now()+UPDATE_INTERVAL_MS;
+let nextUpdateTime=slotStart(Date.now())+UPDATE_INTERVAL_MS;
 function tick(){
   const n=new Date(),w=new Date(n.getTime()+7*36e5),T=d=>`${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
   document.getElementById('t-utc').textContent=T(n);
@@ -748,7 +749,10 @@ document.getElementById('themeBtn').addEventListener('click',()=>setTheme(docume
 /* ===== Main ===== */
 function performUpdate(){
   generateNewValues();renderCards();renderCompass();refreshSceneReading();renderTable();renderCharts();
-  nextUpdateTime=Date.now()+UPDATE_INTERVAL_MS;
+  nextUpdateTime=slotStart(Date.now())+UPDATE_INTERVAL_MS;
+}
+function scheduleUpdate(){ // jalankan tepat di batas kelipatan 10 menit
+  setTimeout(()=>{performUpdate();scheduleUpdate()},Math.max(0,nextUpdateTime-Date.now())+50);
 }
 function init(){
   let t='dark';try{t=localStorage.getItem('aws-theme')||'dark'}catch(e){}
@@ -759,7 +763,7 @@ function init(){
   renderCards();renderCompass();renderTable();renderCharts();tick();
   swingNeedle();
   setInterval(tick,1000);
-  setInterval(performUpdate,UPDATE_INTERVAL_MS);
+  scheduleUpdate();
 }
 /* ===== Asisten suara: tanya lewat mikrofon, dijawab dari data dasbor lewat speaker ===== */
 const DIR_ID=['utara','utara timur laut','timur laut','timur timur laut','timur','timur tenggara','tenggara','selatan tenggara','selatan','selatan barat daya','barat daya','barat barat daya','barat','barat barat laut','barat laut','utara barat laut'];
